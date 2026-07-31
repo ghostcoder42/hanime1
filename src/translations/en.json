@@ -1,0 +1,90 @@
+{
+  "common": {
+    "appName": "HAnime1",
+    "loading": "Loading…",
+    "retry": "Retry",
+    "error": "Something went wrong",
+    "empty": "Nothing here yet",
+    "noResults": "No results found",
+    "endOfList": "You're all caught up",
+    "close": "Close",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "clear": "Clear",
+    "search": "Search",
+    "on": "On",
+    "off": "Off"
+  },
+  "tabs": {
+    "browse": "Browse",
+    "library": "Library",
+    "settings": "Settings"
+  },
+  "home": {
+    "title": "Latest",
+    "latest": "Latest uploads"
+  },
+  "search": {
+    "placeholder": "Search videos, tags, artists…",
+    "history": "Recent searches",
+    "clearHistory": "Clear search history",
+    "sort": "Sort",
+    "genre": "Genre",
+    "tags": "Tags"
+  },
+  "library": {
+    "title": "Library",
+    "favorites": "Favorites",
+    "history": "History",
+    "downloads": "Downloads",
+    "noFavorites": "No favorites yet",
+    "noHistory": "No watch history yet",
+    "noDownloads": "No downloads yet",
+    "clearHistory": "Clear history",
+    "clearHistoryConfirm": "Clear all watch history?",
+    "removeHistory": "Remove from history",
+    "downloading": "Downloading",
+    "failed": "Failed",
+    "cancelled": "Cancelled",
+    "deleteDownloadTitle": "Delete download",
+    "deleteDownloadMsg": "Remove \"{{title}}\" from downloads?"
+  },
+  "detail": {
+    "download": "Download",
+    "downloading": "Downloading… {{progress}}%",
+    "downloaded": "Downloaded",
+    "quality": "Quality",
+    "views": "views",
+    "uploaded": "Uploaded",
+    "tags": "Tags",
+    "play": "Play",
+    "retry": "Tap to retry"
+  },
+  "settings": {
+    "title": "Settings",
+    "appearance": "Appearance",
+    "theme": "Theme",
+    "themeSystem": "System",
+    "themeLight": "Light",
+    "themeDark": "Dark",
+    "domain": "Source domain",
+    "domainDescription": "Switch mirror if the default is blocked or slow",
+    "language": "Language",
+    "security": "Security",
+    "hidePreview": "Hide preview",
+    "data": "Data",
+    "clearCache": "Clear image cache",
+    "clearHistory": "Clear watch history",
+    "about": "About",
+    "version": "Version"
+  },
+  "actions": {
+    "addToFavorites": "Add to favorites",
+    "removeFromFavorites": "Remove from favorites",
+    "download": "Download",
+    "share": "Share",
+    "followAuthor": "Follow author",
+    "unfollowAuthor": "Unfollow author"
+  }
+}

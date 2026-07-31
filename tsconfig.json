@@ -1,0 +1,27 @@
+{
+  "extends": "expo/tsconfig.base",
+  "compilerOptions": {
+    "strict": true,
+    "ignoreDeprecations": "6.0",
+    "types": ["jest", "jest-expo"],
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./src/*"],
+      "@env": ["./src/lib/env.ts"]
+    },
+    "esModuleInterop": true,
+    "checkJs": true
+  },
+  "exclude": [
+    "node_modules",
+    "babel.config.ts",
+    "metro.config.ts",
+    "docs",
+    "cli",
+    "android",
+    "ios",
+    "lint-staged.config.js",
+    "src/components/ui"
+  ],
+  "include": ["**/*.ts", "**/*.tsx", ".expo/types/**/*.ts", "expo-env.d.ts", "nativewind-env.d.ts"]
+}

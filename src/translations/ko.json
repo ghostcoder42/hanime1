@@ -1,0 +1,90 @@
+{
+  "common": {
+    "appName": "HAnime1",
+    "loading": "불러오는 중…",
+    "retry": "다시 시도",
+    "error": "문제가 발생했습니다",
+    "empty": "아직 항목이 없습니다",
+    "noResults": "결과를 찾을 수 없습니다",
+    "endOfList": "모두 확인했습니다",
+    "close": "닫기",
+    "save": "저장",
+    "cancel": "취소",
+    "delete": "삭제",
+    "clear": "지우기",
+    "search": "검색",
+    "on": "켜짐",
+    "off": "꺼짐"
+  },
+  "tabs": {
+    "browse": "둘러보기",
+    "library": "보관함",
+    "settings": "설정"
+  },
+  "home": {
+    "title": "최신",
+    "latest": "최신 업로드"
+  },
+  "search": {
+    "placeholder": "영상, 태그, 작가 검색…",
+    "history": "최근 검색",
+    "clearHistory": "검색 기록 삭제",
+    "sort": "정렬",
+    "genre": "장르",
+    "tags": "태그"
+  },
+  "library": {
+    "title": "보관함",
+    "favorites": "즐겨찾기",
+    "history": "시청 기록",
+    "downloads": "다운로드",
+    "noFavorites": "즐겨찾기가 없습니다",
+    "noHistory": "시청 기록이 없습니다",
+    "noDownloads": "다운로드가 없습니다",
+    "clearHistory": "기록 비우기",
+    "clearHistoryConfirm": "모든 시청 기록을 비우시겠습니까?",
+    "removeHistory": "기록에서 삭제",
+    "downloading": "다운로드 중",
+    "failed": "실패",
+    "cancelled": "취소됨",
+    "deleteDownloadTitle": "다운로드 삭제",
+    "deleteDownloadMsg": "다운로드에서 「{{title}}」을(를) 삭제하시겠습니까?"
+  },
+  "detail": {
+    "download": "다운로드",
+    "downloading": "다운로드 중… {{progress}}%",
+    "downloaded": "다운로드 완료",
+    "quality": "화질",
+    "views": "회 시청",
+    "uploaded": "업로드",
+    "tags": "태그",
+    "play": "재생",
+    "retry": "탭하여 다시 시도"
+  },
+  "settings": {
+    "title": "설정",
+    "appearance": "외관",
+    "theme": "테마",
+    "themeSystem": "시스템",
+    "themeLight": "라이트",
+    "themeDark": "다크",
+    "domain": "소스 도메인",
+    "domainDescription": "기본 도메인이 차단되거나 느리면 미러를 전환하세요",
+    "language": "언어",
+    "security": "보안",
+    "hidePreview": "미리보기 숨기기",
+    "data": "데이터",
+    "clearCache": "이미지 캐시 삭제",
+    "clearHistory": "시청 기록 삭제",
+    "about": "정보",
+    "version": "버전"
+  },
+  "actions": {
+    "addToFavorites": "즐겨찾기에 추가",
+    "removeFromFavorites": "즐겨찾기에서 제거",
+    "download": "다운로드",
+    "share": "공유",
+    "followAuthor": "작가 팔로우",
+    "unfollowAuthor": "작가 팔로우 취소"
+  }
+}

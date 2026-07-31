@@ -1,0 +1,162 @@
+# Build & Release — two triggers:
+#   • push a `v*` tag  → build APK + IPA, attach both to the GitHub Release page
+#   • workflow_dispatch → build APK + IPA (version input), publish as workflow
+#     artifacts on the Actions run page (no Release page touched)
+#
+# Platforms use different mechanisms:
+#   • android: `eas build --local` (signed with the remote EAS keystore)
+#     — arm64-v8a only (via ORG_GRADLE_PROJECT_reactNativeArchitectures) for speed
+#   • ios:     raw `expo prebuild` + `xcodebuild CODE_SIGNING_ALLOWED=NO`
+#              → UNSIGNED IPA (no Apple account needed; end users re-sign via
+#              AltStore/Sideloadly with their own free Apple ID)
+#
+# Artifacts are named by version only: HAnime1-<version>.apk / .ipa
+#
+# Required repo secrets (android job only):
+#   EXPO_TOKEN          – expo.dev access token (fetches the remote keystore)
+#   EAS_PROJECT_ID      – the EAS project id (feeds app.config.ts)
+#   EXPO_ACCOUNT_OWNER  – the expo.dev account/owner (feeds app.config.ts)
+# (GITHUB_TOKEN is provided automatically and used to create the Release.)
+name: Build & Release
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'App version (e.g. 0.0.3)'
+        required: true
+
+jobs:
+  build:
+    name: Build (${{ matrix.platform }})
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { platform: android, os: ubuntu-latest, ext: apk }
+          - { platform: ios, os: macos-latest, ext: ipa }
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: oven-sh/setup-bun@v2
+
+      - name: Resolve app version
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "APP_VERSION=${{ inputs.version }}" >> "$GITHUB_ENV"
+          else
+            echo "APP_VERSION=${GITHUB_REF_NAME#v}" >> "$GITHUB_ENV"
+          fi
+
+      - run: npm pkg set version="$APP_VERSION"
+      - run: bun install --frozen-lockfile
+
+      # ── Android: eas build --local (signed, needs secrets) ──────────────
+      - if: matrix.platform == 'android'
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - if: matrix.platform == 'android'
+        uses: actions/cache@v6
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: gradle-${{ runner.os }}-${{ hashFiles('android/**/*.gradle*', 'android/**/gradle-wrapper.properties', 'package.json') }}
+          restore-keys: gradle-${{ runner.os }}-
+
+      - if: matrix.platform == 'android'
+        name: Install EAS CLI
+        run: npm install -g eas-cli@latest
+
+      - if: matrix.platform == 'android'
+        name: Build signed APK (EAS local, arm64 only)
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+          EAS_PROJECT_ID: ${{ secrets.EAS_PROJECT_ID }}
+          EXPO_ACCOUNT_OWNER: ${{ secrets.EXPO_ACCOUNT_OWNER }}
+          ORG_GRADLE_PROJECT_reactNativeArchitectures: arm64-v8a
+          ORG_GRADLE_PROJECT_org.gradle.caching: 'true'
+        run: |
+          eas build --profile production --platform android \
+            --local --output "HAnime1-${APP_VERSION}.apk" --non-interactive
+
+      # ── iOS: bypass EAS, unsigned build (no secrets) ────────────────────
+      - if: matrix.platform == 'ios'
+        uses: actions/cache@v6
+        with:
+          path: ~/Library/Caches/CocoaPods
+          key: pods-${{ runner.os }}-${{ hashFiles('bun.lock') }}
+          restore-keys: pods-${{ runner.os }}-
+
+      - if: matrix.platform == 'ios'
+        name: Generate iOS native project
+        run: npx expo prebuild -p ios --clean
+
+      - if: matrix.platform == 'ios'
+        name: Install Pods
+        run: cd ios && pod install
+
+      - if: matrix.platform == 'ios'
+        name: Build unsigned IPA
+        run: |
+          cd ios
+          WS=$(ls -d *.xcworkspace | head -1)
+          SCHEME="${WS%.xcworkspace}"
+          echo "Building scheme: $SCHEME ($WS)"
+          xcodebuild build \
+            -workspace "$WS" \
+            -scheme "$SCHEME" \
+            -configuration Release \
+            -derivedDataPath build/DerivedData \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGN_IDENTITY=""
+          cd ..
+          APP=$(find ios/build/DerivedData/Build/Products -name "*.app" -type d | head -1)
+          echo "Found .app: $APP"
+          if [ -z "$APP" ]; then
+            echo "ERROR: no .app produced — searching build tree:"
+            find ios/build -name "*.app" -type d
+            exit 1
+          fi
+          mkdir -p Payload
+          cp -R "$APP" Payload/
+          zip -qr "HAnime1-${APP_VERSION}.ipa" Payload
+          echo "Built HAnime1-${APP_VERSION}.ipa"
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: HAnime1-${{ env.APP_VERSION }}-${{ matrix.platform }}
+          path: HAnime1-${{ env.APP_VERSION }}.${{ matrix.ext }}
+
+  # ── Only on tag push: attach both artifacts to the GitHub Release ────────
+  publish:
+    name: Publish to Release
+    if: startsWith(github.ref, 'refs/tags/')
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v8
+
+      - name: Attach APK + IPA to GitHub Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          TAG="${{ github.ref_name }}"
+          ARTIFACTS=$(find . -type f \( -name "*.apk" -o -name "*.ipa" \))
+          echo "Attaching: $ARTIFACTS"
+          if gh release view "$TAG" -R "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            gh release upload "$TAG" $ARTIFACTS -R "$GITHUB_REPOSITORY" --clobber
+          else
+            gh release create "$TAG" $ARTIFACTS -R "$GITHUB_REPOSITORY" \
+              --title "$TAG" --generate-notes
+          fi

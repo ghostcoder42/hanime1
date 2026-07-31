@@ -1,0 +1,90 @@
+{
+  "common": {
+    "appName": "HAnime1",
+    "loading": "载入中…",
+    "retry": "重试",
+    "error": "发生错误",
+    "empty": "目前没有内容",
+    "noResults": "找不到结果",
+    "endOfList": "已经看完啦",
+    "close": "关闭",
+    "save": "保存",
+    "cancel": "取消",
+    "delete": "删除",
+    "clear": "清除",
+    "search": "搜索",
+    "on": "开",
+    "off": "关"
+  },
+  "tabs": {
+    "browse": "浏览",
+    "library": "收藏库",
+    "settings": "设置"
+  },
+  "home": {
+    "title": "最新",
+    "latest": "最新上传"
+  },
+  "search": {
+    "placeholder": "搜索影片、标签、作者…",
+    "history": "最近搜索",
+    "clearHistory": "清除搜索记录",
+    "sort": "排序",
+    "genre": "类别",
+    "tags": "标签"
+  },
+  "library": {
+    "title": "收藏库",
+    "favorites": "收藏",
+    "history": "观看记录",
+    "downloads": "下载",
+    "noFavorites": "还没有收藏",
+    "noHistory": "还没有观看记录",
+    "noDownloads": "还没有下载",
+    "clearHistory": "清空记录",
+    "clearHistoryConfirm": "确定清空所有观看记录？",
+    "removeHistory": "删除观看记录",
+    "downloading": "下载中",
+    "failed": "失败",
+    "cancelled": "已取消",
+    "deleteDownloadTitle": "删除下载",
+    "deleteDownloadMsg": "从下载中移除「{{title}}」？"
+  },
+  "detail": {
+    "download": "下载",
+    "downloading": "下载中… {{progress}}%",
+    "downloaded": "已下载",
+    "quality": "画质",
+    "views": "次观看",
+    "uploaded": "上架",
+    "tags": "标签",
+    "play": "播放",
+    "retry": "点击重试"
+  },
+  "settings": {
+    "title": "设置",
+    "appearance": "外观",
+    "theme": "主题",
+    "themeSystem": "跟随系统",
+    "themeLight": "浅色",
+    "themeDark": "深色",
+    "domain": "数据源域名",
+    "domainDescription": "若默认域名被封锁或缓慢，可切换镜像",
+    "language": "语言",
+    "security": "安全",
+    "hidePreview": "隐藏预览",
+    "data": "数据",
+    "clearCache": "清除图片缓存",
+    "clearHistory": "清除观看记录",
+    "about": "关于",
+    "version": "版本"
+  },
+  "actions": {
+    "addToFavorites": "加入收藏",
+    "removeFromFavorites": "取消收藏",
+    "download": "下载",
+    "share": "分享",
+    "followAuthor": "追踪作者",
+    "unfollowAuthor": "取消追踪作者"
+  }
+}

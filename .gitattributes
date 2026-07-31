@@ -1,0 +1,3 @@
+# Scraped site snapshots — test fixtures, not app code.
+# Excluded from language stats, search, and collapsed in diffs.
+src/lib/hanime1/fixtures/*.html linguist-generated=true

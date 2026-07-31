@@ -1,0 +1,31 @@
+# Verifies dependencies are aligned with the installed Expo SDK.
+# Runs when package.json / lockfile changes or manually.
+name: Expo Doctor
+on:
+  workflow_dispatch:
+  push:
+    branches: [main, master]
+    paths:
+      - 'package.json'
+      - 'bun.lock'
+  pull_request:
+    branches: [main, master]
+    paths:
+      - 'package.json'
+      - 'bun.lock'
+
+jobs:
+  doctor:
+    name: expo-doctor
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: oven-sh/setup-bun@v2
+      - run: bun install --frozen-lockfile
+        # Advisory-only: the "packages match SDK versions" check occasionally
+        # false-positives on a stale registry cache (`expo install --check` is
+        # the authoritative source and passes). ci.yml (lint/typecheck/test)
+        # remains the blocking quality gate.
+        continue-on-error: true
+      - run: bunx expo-doctor@latest
+        continue-on-error: true
