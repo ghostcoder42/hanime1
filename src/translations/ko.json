@@ -77,7 +77,15 @@
     "clearCache": "이미지 캐시 삭제",
     "clearHistory": "시청 기록 삭제",
     "about": "정보",
-    "version": "버전"
+    "version": "버전",
+    "checkUpdates": "업데이트 확인",
+    "checkNow": "확인",
+    "upToDate": "이미 최신 버전입니다",
+    "updateCheckFailed": "업데이트 확인 실패",
+    "updateAvailableTitle": "새 버전 있음",
+    "updateAvailableMsg": "새 버전 {{version}} 사용 가능(현재 {{current}}). 지금 다운로드하시겠습니까?",
+    "updateNow": "지금 업데이트",
+    "updateAvailableHint": "새 버전 {{version}} 사용 가능"
   },
   "actions": {
     "addToFavorites": "즐겨찾기에 추가",

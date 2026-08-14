@@ -4,12 +4,13 @@ import { SafeAreaView } from '@/components/safe-area-view';
 import { SITE_DOMAINS, SITE_DOMAIN_KEY, type SiteDomain } from '@/lib/hanime1/endpoints';
 import { type ThemeMode, useThemeConfig } from '@/lib/hooks';
 import { useSecuritySettings } from '@/lib/hooks/use-security-settings';
+import { useUpdateCheck } from '@/lib/hooks/use-update-check';
 import { LANGUAGE_LABELS, type Language } from '@/lib/i18n/resources';
 import type { TxKeyPath } from '@/lib/i18n/types';
 import { useSelectedLanguage, useTranslate } from '@/lib/i18n/utils';
 import { useDownloadedStore, useHistoryStore } from '@/lib/stores';
 import { Env } from '@env';
-import { Pressable, ScrollView, Text, View } from 'react-native';
+import { ActivityIndicator, Pressable, ScrollView, Text, View } from 'react-native';
 import { showMessage } from 'react-native-flash-message';
 import { useMMKVString } from 'react-native-mmkv';
 
@@ -80,6 +81,7 @@ export default function SettingsScreen() {
   const clearHistory = useHistoryStore((s) => s.clearHistory);
   const clearDownloads = useDownloadedStore((s) => s.clearAll);
   const { hidePreview, setHidePreview } = useSecuritySettings();
+  const update = useUpdateCheck();
   const currentDomain = (domain ?? SITE_DOMAINS[0]) as SiteDomain;
 
   const changeDomain = (d: SiteDomain) => {
@@ -157,6 +159,28 @@ export default function SettingsScreen() {
         </Pressable>
 
         <SectionTitle>{t('settings.about')}</SectionTitle>
+        <Pressable
+          android_ripple={{ color: '#00000020' }}
+          onPress={() => void update.check()}
+          disabled={update.checking}
+        >
+          <Row
+            label={t('settings.checkUpdates')}
+            description={
+              update.hasUpdate
+                ? t('settings.updateAvailableHint', { version: update.latestVersion ?? '' })
+                : undefined
+            }
+          >
+            {update.checking ? (
+              <ActivityIndicator size="small" color="#fb7185" />
+            ) : update.hasUpdate ? (
+              <Text className="text-rose-500">{update.latestVersion}</Text>
+            ) : (
+              <Text className="text-muted-foreground">{t('settings.checkNow')}</Text>
+            )}
+          </Row>
+        </Pressable>
         <Row label={t('settings.version')}>
           <Text className="text-muted-foreground">{VERSION}</Text>
         </Row>

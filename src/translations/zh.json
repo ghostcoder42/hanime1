@@ -77,7 +77,15 @@
     "clearCache": "清除圖片快取",
     "clearHistory": "清除觀看紀錄",
     "about": "關於",
-    "version": "版本"
+    "version": "版本",
+    "checkUpdates": "檢查更新",
+    "checkNow": "檢查",
+    "upToDate": "已是最新版本",
+    "updateCheckFailed": "檢查更新失敗",
+    "updateAvailableTitle": "發現新版本",
+    "updateAvailableMsg": "新版本 {{version}} 已發布（目前 {{current}}），是否前往下載？",
+    "updateNow": "立即更新",
+    "updateAvailableHint": "有新版本 {{version}} 可供更新"
   },
   "actions": {
     "addToFavorites": "加入收藏",

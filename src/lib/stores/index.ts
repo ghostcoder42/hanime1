@@ -8,3 +8,5 @@ export { useDownloadedStore } from './downloaded-store';
 export { useFavoritesStore, type FavoriteItem } from './favorites-store';
 export { useFollowingStore, type FollowedAuthor } from './following-store';
 export { useHistoryStore, type HistoryItem } from './history-store';
+export { mmkvStateStorage } from './mmkv-storage';
+export { useUpdateStore } from './update-store';
