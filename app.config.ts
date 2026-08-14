@@ -15,12 +15,26 @@ dotenv.config({ path: path.resolve(__dirname, `.env.${APP_ENV}`) });
 
 const BUNDLE_ID = 'app.hanime1'; // ios bundle id
 const PACKAGE = 'app.hanime1'; // android package name
-const NAME = 'HAnime1'; // app name
+const APP_DISPLAY_NAME = 'HAnime1'; // app name
 const SCHEME = 'hanime1'; // app scheme
 
-/** Add a per-env suffix except in production (e.g. app.hanime1.development). */
+/** Per-env suffix for bundle id / package name (e.g. app.hanime1.test). */
+const ENV_SUFFIX: Record<string, string> = {
+  development: 'test',
+  staging: 'staging',
+};
 const withEnvSuffix = (name: string): string =>
-  APP_ENV === 'production' ? name : `${name}.${APP_ENV}`;
+  APP_ENV === 'production' ? name : `${name}.${ENV_SUFFIX[APP_ENV] ?? APP_ENV}`;
+
+/** Per-env display name suffix (e.g. "HAnime1 (Test)"). */
+const ENV_NAME_LABEL: Record<string, string> = {
+  development: ' (Test)',
+  staging: ' (Staging)',
+};
+const NAME =
+  APP_ENV === 'production'
+    ? APP_DISPLAY_NAME
+    : `${APP_DISPLAY_NAME}${ENV_NAME_LABEL[APP_ENV] ?? ''}`;
 
 const client = z.object({
   APP_ENV: z.enum(['development', 'staging', 'production']),
@@ -101,7 +115,7 @@ export default ({ config }: ConfigContext): ExpoConfig =>
         foregroundImage: './assets/android-icon-foreground.png',
         backgroundImage: './assets/android-icon-background.png',
         monochromeImage: './assets/android-icon-monochrome.png',
-        backgroundColor: '#0a0a0a',
+        backgroundColor: APP_ENV === 'production' ? '#0a0a0a' : '#0a0a2e',
       },
       package: Env.PACKAGE,
     },
