@@ -1,4 +1,5 @@
 import { queryClient } from '@/api/common/query-client';
+import { ScreenErrorBoundary } from '@/components/error-boundary';
 import { SafeAreaView } from '@/components/safe-area-view';
 import { SITE_DOMAINS, SITE_DOMAIN_KEY, type SiteDomain } from '@/lib/hanime1/endpoints';
 import { type ThemeMode, useThemeConfig } from '@/lib/hooks';
@@ -68,6 +69,8 @@ function SectionTitle({ children }: { children: string }) {
     </Text>
   );
 }
+
+export { ScreenErrorBoundary as ErrorBoundary };
 
 export default function SettingsScreen() {
   const t = useTranslate();

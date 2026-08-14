@@ -1,9 +1,12 @@
 import { useSearchVideos } from '@/api/video-queries';
+import { ScreenErrorBoundary } from '@/components/error-boundary';
 import { SafeAreaView } from '@/components/safe-area-view';
 import { VideoGrid } from '@/components/video-grid';
 import { useLocalSearchParams } from 'expo-router';
 import { useMemo } from 'react';
 import { Text, View } from 'react-native';
+
+export { ScreenErrorBoundary as ErrorBoundary };
 
 export default function TagScreen() {
   const params = useLocalSearchParams<{ name: string }>();

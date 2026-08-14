@@ -1,4 +1,5 @@
 import { useSearchVideos } from '@/api/video-queries';
+import { ScreenErrorBoundary } from '@/components/error-boundary';
 import { Icon } from '@/components/icon';
 import { SafeAreaView } from '@/components/safe-area-view';
 import {
@@ -35,6 +36,8 @@ function GenreChip({
     </Pressable>
   );
 }
+
+export { ScreenErrorBoundary as ErrorBoundary };
 
 export default function BrowseScreen() {
   const t = useTranslate();

@@ -25,7 +25,7 @@ export type VideoDownloadState = {
 
 export function useVideoDownload(opts: UseVideoDownloadOptions): VideoDownloadState {
   const fileUri = localUriFor(opts.videoId);
-  const downloaded = useDownloadedStore((s) => s.get(opts.videoId));
+  const isDownloaded = useDownloadedStore((s) => s.has(opts.videoId));
 
   const [isDownloading, setIsDownloading] = useState(false);
   const [downloadProgress, setDownloadProgress] = useState(0);
@@ -83,7 +83,7 @@ export function useVideoDownload(opts: UseVideoDownloadOptions): VideoDownloadSt
   return {
     isDownloading,
     downloadProgress,
-    isDownloaded: !!downloaded,
+    isDownloaded,
     fileUri,
     error,
     handleDownload,

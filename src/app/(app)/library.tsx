@@ -1,3 +1,4 @@
+import { ScreenErrorBoundary } from '@/components/error-boundary';
 import { Icon } from '@/components/icon';
 import { StyledImage } from '@/components/native-styled';
 import { SafeAreaView } from '@/components/safe-area-view';
@@ -248,6 +249,8 @@ function DownloadsTab() {
     </ScrollView>
   );
 }
+
+export { ScreenErrorBoundary as ErrorBoundary };
 
 export default function LibraryScreen() {
   const t = useTranslate();

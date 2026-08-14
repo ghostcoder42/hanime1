@@ -1,4 +1,5 @@
 import { useVideoDetail } from '@/api/video-queries';
+import { ScreenErrorBoundary } from '@/components/error-boundary';
 import { Icon } from '@/components/icon';
 import { StyledVideoView } from '@/components/native-styled';
 import { SafeAreaView } from '@/components/safe-area-view';
@@ -18,6 +19,8 @@ import { Link, useLocalSearchParams } from 'expo-router';
 import { useVideoPlayer } from 'expo-video';
 import { useEffect, useMemo, useState } from 'react';
 import { ActivityIndicator, Pressable, ScrollView, Share, Text, View } from 'react-native';
+
+export { ScreenErrorBoundary as ErrorBoundary };
 
 export default function WatchScreen() {
   const t = useTranslate();
