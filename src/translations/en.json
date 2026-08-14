@@ -77,7 +77,15 @@
     "clearCache": "Clear image cache",
     "clearHistory": "Clear watch history",
     "about": "About",
-    "version": "Version"
+    "version": "Version",
+    "checkUpdates": "Check for updates",
+    "checkNow": "Check",
+    "upToDate": "You're on the latest version",
+    "updateCheckFailed": "Failed to check for updates",
+    "updateAvailableTitle": "Update available",
+    "updateAvailableMsg": "Version {{version}} is available (current: {{current}}). Download it now?",
+    "updateNow": "Update now",
+    "updateAvailableHint": "New version {{version}} available"
   },
   "actions": {
     "addToFavorites": "Add to favorites",

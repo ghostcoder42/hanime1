@@ -77,7 +77,15 @@
     "clearCache": "画像キャッシュを消去",
     "clearHistory": "視聴履歴を消去",
     "about": "情報",
-    "version": "バージョン"
+    "version": "バージョン",
+    "checkUpdates": "アップデートを確認",
+    "checkNow": "確認",
+    "upToDate": "すでに最新バージョンです",
+    "updateCheckFailed": "アップデートの確認に失敗しました",
+    "updateAvailableTitle": "新しいバージョンがあります",
+    "updateAvailableMsg": "新しいバージョン {{version}} が利用可能です（現在 {{current}}）。今すぐダウンロードしますか？",
+    "updateNow": "今すぐ更新",
+    "updateAvailableHint": "新しいバージョン {{version}} があります"
   },
   "actions": {
     "addToFavorites": "お気に入りに追加",
