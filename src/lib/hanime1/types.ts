@@ -4,6 +4,16 @@ export type VideoSource = {
   url: string;
 };
 
+/**
+ * Tag on a watch page. `tag` = attribute filter (searched via `tags[]`
+ * params, e.g. 1080p / 巨乳); `query` = free-text franchise/character tag
+ * (the site links it as a `/search?query=…` search).
+ */
+export type VideoTag = {
+  name: string;
+  kind: 'tag' | 'query';
+};
+
 /** Minimal card shape used by grids, favorites & history. */
 export type VideoListItem = {
   id: string;
@@ -23,7 +33,7 @@ export type VideoDetail = VideoListItem & {
   viewsText?: string;
   uploadedDate?: string;
   likePercent?: string;
-  tags: string[];
+  tags: VideoTag[];
   sources: VideoSource[];
   /** high-res poster thumbnail */
   thumbnailHi?: string;

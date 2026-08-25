@@ -201,10 +201,19 @@ export default function WatchScreen() {
                 {t('detail.tags')}
               </Text>
               <View className="flex-row flex-wrap gap-2">
-                {data.tags.map((t) => (
-                  <Link key={t} href={{ pathname: '/tag/[name]', params: { name: t } }} asChild>
+                {data.tags.map((tag) => (
+                  <Link
+                    key={`${tag.kind}:${tag.name}`}
+                    href={{
+                      pathname: '/tag/[name]',
+                      params: { name: tag.name, type: tag.kind },
+                    }}
+                    asChild
+                  >
                     <Pressable className="rounded-full bg-muted px-2.5 py-1">
-                      <Text className="text-xs text-foreground">{t}</Text>
+                      <Text className="text-xs text-foreground">
+                        {tag.kind === 'query' ? `#${tag.name}` : tag.name}
+                      </Text>
                     </Pressable>
                   </Link>
                 ))}
