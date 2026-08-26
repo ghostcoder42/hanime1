@@ -1,5 +1,6 @@
 import { type TileExtraAction, type TileItem, VideoTile } from '@/components/video-tile';
-import { useColumns } from '@/lib/hooks';
+import { type CardOrientation, cardOrientation } from '@/lib/hanime1/images';
+import { PORTRAIT_MIN_TILE_WIDTH, useColumns } from '@/lib/hooks';
 import { useTranslate } from '@/lib/i18n/utils';
 import { FlashList } from '@shopify/flash-list';
 import type { ReactElement } from 'react';
@@ -13,6 +14,13 @@ export type VideoGridProps = {
   isFetchingNextPage?: boolean;
   isLoading?: boolean;
   columns?: number;
+  /**
+   * Card form for every tile in the grid. All tiles share one orientation so
+   * rows stay aligned (FlashList numColumns needs uniform item heights).
+   * `'auto'` (default) infers it from the first item's thumbnail URL — site
+   * listings are homogeneous, so this picks the right form per source.
+   */
+  orientation?: CardOrientation | 'auto';
   ListHeaderComponent?: ReactElement;
   /** Per-tile extra long-press menu actions (e.g. remove from history). */
   extraActions?: (item: TileItem) => TileExtraAction[];
@@ -27,13 +35,21 @@ export function VideoGrid({
   isFetchingNextPage,
   isLoading,
   columns,
+  orientation = 'auto',
   ListHeaderComponent,
   extraActions,
   contentContainerStyle,
 }: VideoGridProps) {
   const t = useTranslate();
-  const autoColumns = useColumns();
-  const numColumns = columns ?? autoColumns;
+  const landscapeColumns = useColumns();
+  const portraitColumns = useColumns(PORTRAIT_MIN_TILE_WIDTH);
+  const form: CardOrientation =
+    orientation !== 'auto'
+      ? orientation
+      : items[0]
+        ? cardOrientation(items[0].thumbnail)
+        : 'landscape';
+  const numColumns = columns ?? (form === 'portrait' ? portraitColumns : landscapeColumns);
 
   if (isLoading) {
     return (
@@ -52,7 +68,7 @@ export function VideoGrid({
         renderItem={({ item, index }) => {
           const tile = (
             <View className="px-1 pb-3">
-              <VideoTile item={item} extraActions={extraActions?.(item)} />
+              <VideoTile item={item} orientation={form} extraActions={extraActions?.(item)} />
             </View>
           );
           if (numColumns > 1) {
