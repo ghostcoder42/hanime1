@@ -10,11 +10,34 @@ import type { TxKeyPath } from '@/lib/i18n/types';
 import { useSelectedLanguage, useTranslate } from '@/lib/i18n/utils';
 import { useDownloadedStore, useHistoryStore } from '@/lib/stores';
 import { Env } from '@env';
-import { ActivityIndicator, Pressable, ScrollView, Text, View } from 'react-native';
+// Namespace import: named imports from this package break under Metro's lazy
+// bundles (binding missing at runtime), destructuring after import works.
+import * as ApplicationNS from 'expo-application';
+import { ActivityAction, startActivityAsync } from 'expo-intent-launcher';
+import { ActivityIndicator, Platform, Pressable, ScrollView, Text, View } from 'react-native';
 import { showMessage } from 'react-native-flash-message';
 import { useMMKVString } from 'react-native-mmkv';
 
+const { applicationId } = ApplicationNS;
+
 const VERSION = Env.VERSION ?? '1.0.0';
+
+/**
+ * Open the system screen where the user can allow this app to handle the
+ * site domains. The domains can't pass server-side verification (we don't
+ * own them), so each one must be enabled by hand — Android 12+ silently
+ * routes unverified/unselected links to the browser without asking.
+ * Tries the direct "Open by default" screen (Android 12+), falls back to
+ * the app details screen where that entry lives.
+ */
+const openAppLinkSettings = async () => {
+  const params = { data: `package:${applicationId}` };
+  try {
+    await startActivityAsync(ActivityAction.APP_OPEN_BY_DEFAULT_SETTINGS, params);
+  } catch {
+    await startActivityAsync(ActivityAction.APPLICATION_DETAILS_SETTINGS, params);
+  }
+};
 
 const THEME_LABELS: Record<ThemeMode, TxKeyPath> = {
   system: 'settings.themeSystem',
@@ -121,6 +144,23 @@ export default function SettingsScreen() {
             />
           ))}
         </Row>
+
+        {Platform.OS === 'android' ? (
+          <>
+            <SectionTitle>{t('settings.openLinks')}</SectionTitle>
+            <Text className="px-4 pb-1 text-xs leading-4 text-muted-foreground">
+              {t('settings.openLinksDescription')}
+            </Text>
+            <Pressable
+              android_ripple={{ color: '#00000020' }}
+              onPress={() => void openAppLinkSettings()}
+            >
+              <Row label={SITE_DOMAINS.map((d) => d.replace('https://', '')).join(' / ')}>
+                <Text className="text-rose-500">{t('settings.enableLinks')}</Text>
+              </Row>
+            </Pressable>
+          </>
+        ) : null}
 
         <SectionTitle>{t('settings.language')}</SectionTitle>
         <Row label={t('settings.language')}>

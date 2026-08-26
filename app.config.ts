@@ -106,6 +106,10 @@ export default ({ config }: ConfigContext): ExpoConfig =>
     ios: {
       supportsTablet: true,
       bundleIdentifier: Env.BUNDLE_ID,
+      // Universal links for both site mirrors. Verification requires each
+      // domain to serve an AASA file (apple-app-site-association); until then
+      // the app is still listed as a candidate handler for tapped links.
+      associatedDomains: ['applinks:hanime1.me', 'applinks:hanimeone.me'],
       config: {
         usesNonExemptEncryption: false, // Avoid the export compliance warning on the app store
       },
@@ -118,6 +122,24 @@ export default ({ config }: ConfigContext): ExpoConfig =>
         backgroundColor: APP_ENV === 'production' ? '#0a0a0a' : '#0a0a2e',
       },
       package: Env.PACKAGE,
+      // App links for both site mirrors so hanime1.me / hanimeone.me URLs
+      // (e.g. /watch?v=123) open in the app instead of the browser. One filter
+      // per host: sharing a filter makes verification all-or-nothing across
+      // hosts, so a failing mirror would break the working one too.
+      intentFilters: [
+        {
+          action: 'VIEW',
+          autoVerify: true,
+          data: [{ scheme: 'https', host: 'hanime1.me' }],
+          category: ['BROWSABLE', 'DEFAULT'],
+        },
+        {
+          action: 'VIEW',
+          autoVerify: true,
+          data: [{ scheme: 'https', host: 'hanimeone.me' }],
+          category: ['BROWSABLE', 'DEFAULT'],
+        },
+      ],
     },
     web: {
       favicon: './assets/favicon.png',
