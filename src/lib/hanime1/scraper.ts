@@ -9,7 +9,7 @@
  * groups (`match[1..n]`) exclusively and avoid `.groups`.
  */
 import { buildSearchUrl, buildUrl, endpoints } from './endpoints';
-import type { ListResult, VideoDetail, VideoListItem, VideoSource } from './types';
+import type { ListResult, VideoDetail, VideoListItem, VideoSource, VideoTag } from './types';
 
 const USER_AGENT =
   'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36';
@@ -76,6 +76,15 @@ export function decodeHTMLEntities(text: string): string {
 
 function stripTags(html: string): string {
   return html.replace(/<[^>]*>/g, '');
+}
+
+/** decodeURIComponent that never throws (a stray `%` must not kill the parse). */
+function safeDecodeURIComponent(text: string): string {
+  try {
+    return decodeURIComponent(text);
+  } catch {
+    return text;
+  }
 }
 
 function firstMatch(html: string, pattern: RegExp): string | undefined {
@@ -183,18 +192,45 @@ function parseSources(html: string): VideoSource[] {
   return sources.sort((a, b) => b.resolution - a.resolution);
 }
 
-function parseTags(html: string): string[] {
-  const tags = new Set<string>();
-  // structured content tags: <a href="/search?tags[]=TAG">TAG</a>
-  forEachMatch(html, /href="\/search\?tags\[\]=([^"&]+)"/g, (mm) => {
-    if (mm[1]) tags.add(decode(decodeURIComponent(mm[1])));
-  });
-  // free-text tags: <a href="/search?query=TXT"># TXT</a>
-  forEachMatch(html, /href="\/search\?query=([^"&]+)"[^>]*>#?\s*([^<]+)</g, (mm) => {
-    const label = mm[2]?.trim();
-    if (label && !label.startsWith('http')) tags.add(decode(label));
-  });
-  return [...tags];
+/**
+ * Parse the `single-video-tag` blocks of a watch page. The site renders two
+ * kinds of tag links:
+ *  - attribute filters:  `/search?tags%5B%5D=巨乳` (label + `<span>(1)</span>` count)
+ *  - franchise/character: `/search?query=絕區零` (nested `<span>#</span>` prefix)
+ * The brackets arrive percent-encoded (`tags%5B%5D`) and the label wraps
+ * extra markup, so we strip tags from the anchor text and derive the kind
+ * from the href.
+ */
+function parseTags(html: string): VideoTag[] {
+  const tags: VideoTag[] = [];
+  const seen = new Set<string>();
+  forEachMatch(
+    html,
+    /class="single-video-tag[\s\S]*?<a\s[^>]*href="([^"]+)"[^>]*>([\s\S]*?)<\/a>/g,
+    (m) => {
+      const href = m[1] ?? '';
+      const label = decode(stripTags(m[2] ?? ''))
+        .replace(/^#/, '')
+        .replace(/\(\d+\)\s*$/, '')
+        .trim();
+      let kind: VideoTag['kind'] | null = null;
+      let paramValue = '';
+      if (/([?&]tags(?:%5B%5D|\[\])=)/.test(href)) {
+        kind = 'tag';
+        paramValue = href.split(/(?:\?|&)tags(?:%5B%5D|\[\])=/)[1]?.split('&')[0] ?? '';
+      } else if (/[?&]query=/.test(href)) {
+        kind = 'query';
+        paramValue = href.split(/(?:\?|&)query=/)[1]?.split('&')[0] ?? '';
+      }
+      const name = label || decode(safeDecodeURIComponent(paramValue));
+      const key = kind ? `${kind}:${name}` : '';
+      if (kind && name && !seen.has(key)) {
+        seen.add(key);
+        tags.push({ name, kind });
+      }
+    }
+  );
+  return tags;
 }
 
 /** Parse a `/watch?v=ID` page into a full video detail with stream sources. */
@@ -210,7 +246,8 @@ export function parseVideoDetail(html: string, id: string): VideoDetail {
     '';
 
   const author = firstMatch(html, /id="video-artist-name"[^>]*>([^<]+)</);
-  const authorId = firstMatch(html, /href="https?:\/\/[^/]*\/user\/(\d+)"/);
+  // The user-page link may be absolute (https://host/user/123) or root-relative.
+  const authorId = firstMatch(html, /href="(?:https?:\/\/[^/]*?)?\/user\/(\d+)"/);
   const genre = firstMatch(html, /href="\/search\?genre=([^"&]+)"/);
 
   // "觀看次數：1.1萬次  2026-07-22"
@@ -231,7 +268,7 @@ export function parseVideoDetail(html: string, id: string): VideoDetail {
     thumbnailHi: ogImage,
     author,
     authorId,
-    genre: genre ? decode(decodeURIComponent(genre)) : undefined,
+    genre: genre ? decode(safeDecodeURIComponent(genre)) : undefined,
     viewsText,
     uploadedDate,
     likePercent,

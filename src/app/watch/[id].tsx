@@ -15,9 +15,9 @@ import {
   useHistoryStore,
 } from '@/lib/stores';
 import { useEvent } from 'expo';
-import { Link, useLocalSearchParams } from 'expo-router';
+import { Link, useFocusEffect, useLocalSearchParams } from 'expo-router';
 import { useVideoPlayer } from 'expo-video';
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { ActivityIndicator, Pressable, ScrollView, Share, Text, View } from 'react-native';
 
 export { ScreenErrorBoundary as ErrorBoundary };
@@ -78,6 +78,23 @@ export default function WatchScreen() {
     p.loop = true;
   });
   const { isPlaying } = useEvent(player, 'playingChange', { isPlaying: player.playing });
+
+  // Pause when this screen loses focus (opening the author page, a tag page or
+  // another video keeps this screen mounted in the stack — without this, its
+  // audio keeps playing under the new screen). On unmount expo-video may
+  // release the native player before this cleanup runs; pause() then throws
+  // "shared object already released", which is safe to ignore.
+  useFocusEffect(
+    useCallback(() => {
+      return () => {
+        try {
+          player.pause();
+        } catch {
+          // Player already released (screen unmounting) — nothing to do.
+        }
+      };
+    }, [player])
+  );
 
   if (isLoading) {
     return (
@@ -201,10 +218,19 @@ export default function WatchScreen() {
                 {t('detail.tags')}
               </Text>
               <View className="flex-row flex-wrap gap-2">
-                {data.tags.map((t) => (
-                  <Link key={t} href={{ pathname: '/tag/[name]', params: { name: t } }} asChild>
+                {data.tags.map((tag) => (
+                  <Link
+                    key={`${tag.kind}:${tag.name}`}
+                    href={{
+                      pathname: '/tag/[name]',
+                      params: { name: tag.name, type: tag.kind },
+                    }}
+                    asChild
+                  >
                     <Pressable className="rounded-full bg-muted px-2.5 py-1">
-                      <Text className="text-xs text-foreground">{t}</Text>
+                      <Text className="text-xs text-foreground">
+                        {tag.kind === 'query' ? `#${tag.name}` : tag.name}
+                      </Text>
                     </Pressable>
                   </Link>
                 ))}

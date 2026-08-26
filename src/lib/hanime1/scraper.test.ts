@@ -95,4 +95,31 @@ describe('parseVideoDetail', () => {
   it('parses an author when present', () => {
     expect(typeof detail.author).toBe('string');
   });
+
+  it('parses the author id linking to the user page', () => {
+    expect(detail.authorId).toMatch(/^\d+$/);
+  });
+
+  it('parses both kinds of tags from single-video-tag blocks', () => {
+    expect(detail.tags.length).toBeGreaterThan(0);
+    for (const tag of detail.tags) {
+      expect(['tag', 'query']).toContain(tag.kind);
+      expect(tag.name.length).toBeGreaterThan(0);
+      // the '#' prefix and the '(N)' use count must not leak into the name
+      expect(tag.name).not.toMatch(/^[#\s]/);
+      expect(tag.name).not.toMatch(/\(\d+\)$/);
+    }
+    // the fixture page has both attribute tags (tags%5B%5D=…) and
+    // franchise/character tags (/search?query=…)
+    expect(detail.tags.some((tag) => tag.kind === 'tag')).toBe(true);
+    expect(detail.tags.some((tag) => tag.kind === 'query')).toBe(true);
+  });
+
+  it('never throws on malformed percent-encoding in tag hrefs', () => {
+    // Empty label forces the href-param fallback; a stray `%` must not raise
+    // a URIError that would fail the whole detail parse.
+    const html = '<div class="single-video-tag"><a href="/search?tags%5B%5D=50%off"></a></div>';
+    const detail = parseVideoDetail(html, '1');
+    expect(detail.tags).toEqual([{ name: '50%off', kind: 'tag' }]);
+  });
 });

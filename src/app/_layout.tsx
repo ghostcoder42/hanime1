@@ -20,12 +20,13 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 SplashScreen.preventAutoHideAsync().catch(() => {});
 
 /**
- * Compact, themed header for the watch detail screen: just a back chevron, no
- * title (the video title is shown in the body). Shorter than the default native
- * bar and uses the app background so it matches light/dark mode. The SafeAreaView
- * top edge fills behind the status bar so it never overlaps it.
+ * Compact, themed header with just a back chevron and no title, used by the
+ * detail screens (watch / user / tag) whose body already shows a large title.
+ * Shorter than the default native bar and uses the app background so it matches
+ * light/dark mode. The SafeAreaView top edge fills behind the status bar so it
+ * never overlaps it.
  */
-function WatchHeader({ onBack }: { onBack: () => void }) {
+function BackHeader({ onBack }: { onBack: () => void }) {
   return (
     <SafeAreaView edges={['top']} className="bg-background">
       <View className="h-9 flex-row items-center">
@@ -80,7 +81,7 @@ export default function RootLayout() {
                         headerShown: true,
                         title: '',
                         header: ({ navigation }) => (
-                          <WatchHeader onBack={() => navigation.goBack()} />
+                          <BackHeader onBack={() => navigation.goBack()} />
                         ),
                       }}
                     />
@@ -88,16 +89,20 @@ export default function RootLayout() {
                       name="user/[id]"
                       options={{
                         headerShown: true,
-                        headerBackTitle: 'Back',
-                        headerTintColor: '#fb7185',
+                        title: '',
+                        header: ({ navigation }) => (
+                          <BackHeader onBack={() => navigation.goBack()} />
+                        ),
                       }}
                     />
                     <Stack.Screen
                       name="tag/[name]"
                       options={{
                         headerShown: true,
-                        headerBackTitle: 'Back',
-                        headerTintColor: '#fb7185',
+                        title: '',
+                        header: ({ navigation }) => (
+                          <BackHeader onBack={() => navigation.goBack()} />
+                        ),
                       }}
                     />
                   </Stack>

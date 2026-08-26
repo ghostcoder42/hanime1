@@ -9,10 +9,14 @@ import { Text, View } from 'react-native';
 export { ScreenErrorBoundary as ErrorBoundary };
 
 export default function TagScreen() {
-  const params = useLocalSearchParams<{ name: string }>();
+  const params = useLocalSearchParams<{ name: string; type?: string }>();
   const name = params.name;
+  // `query` tags (franchise/character, e.g. #絕區零) must be searched as free
+  // text — the `tags[]` filter knows nothing about them.
+  const searchTags = params.type === 'query' ? undefined : [name];
+  const query = params.type === 'query' ? name : undefined;
   const { data, fetchNextPage, isFetchingNextPage, isLoading, refetch, isFetching } =
-    useSearchVideos({ variables: { tags: [name] } });
+    useSearchVideos({ variables: { tags: searchTags, query } });
 
   const items = useMemo(() => data?.pages.flatMap((p) => p.items) ?? [], [data]);
 
