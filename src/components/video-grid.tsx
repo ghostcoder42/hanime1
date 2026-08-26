@@ -1,6 +1,11 @@
 import { type TileExtraAction, type TileItem, VideoTile } from '@/components/video-tile';
 import { type CardOrientation, cardOrientation } from '@/lib/hanime1/images';
-import { PORTRAIT_MIN_TILE_WIDTH, useColumns } from '@/lib/hooks';
+import {
+  LANDSCAPE_MAX_COLUMNS,
+  MIN_TILE_WIDTH,
+  PORTRAIT_MIN_TILE_WIDTH,
+  useColumns,
+} from '@/lib/hooks';
 import { useTranslate } from '@/lib/i18n/utils';
 import { FlashList } from '@shopify/flash-list';
 import type { ReactElement } from 'react';
@@ -41,7 +46,7 @@ export function VideoGrid({
   contentContainerStyle,
 }: VideoGridProps) {
   const t = useTranslate();
-  const landscapeColumns = useColumns();
+  const landscapeColumns = useColumns(MIN_TILE_WIDTH, LANDSCAPE_MAX_COLUMNS);
   const portraitColumns = useColumns(PORTRAIT_MIN_TILE_WIDTH);
   const form: CardOrientation =
     orientation !== 'auto'
@@ -72,7 +77,30 @@ export function VideoGrid({
             </View>
           );
           if (numColumns > 1) {
-            return <View style={{ flex: 1 / numColumns }}>{tile}</View>;
+            // flex-[x] maps to RN `flex: x` (grow/shrink/basis-0), so each cell
+            // takes 1/numColumns of the row and the last short row stays
+            // aligned instead of stretching. Percentage widths (w-1/n) don't
+            // work here — FlashList measures cells before the row width is
+            // known, shrinking their content. The literals must stay inline in
+            // the className expression — NativeWind only compiles classes it
+            // can see statically, so a Record lookup would render unstyled.
+            return (
+              <View
+                className={
+                  numColumns === 6
+                    ? 'flex-[0.1666667]'
+                    : numColumns === 5
+                      ? 'flex-[0.2]'
+                      : numColumns === 4
+                        ? 'flex-[0.25]'
+                        : numColumns === 3
+                          ? 'flex-[0.3333333]'
+                          : 'flex-[0.5]'
+                }
+              >
+                {tile}
+              </View>
+            );
           }
           void index;
           return tile;

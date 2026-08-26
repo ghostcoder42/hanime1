@@ -1,4 +1,10 @@
-export { computeColumns, PORTRAIT_MIN_TILE_WIDTH, useColumns } from './use-columns';
+export {
+  computeColumns,
+  LANDSCAPE_MAX_COLUMNS,
+  MIN_TILE_WIDTH,
+  PORTRAIT_MIN_TILE_WIDTH,
+  useColumns,
+} from './use-columns';
 export { useSearchHistory } from './use-search-history';
 export { useUpdateCheck, type UpdateCheckState } from './use-update-check';
 export { useVideoActions, type ActionableItem } from './use-video-actions';
