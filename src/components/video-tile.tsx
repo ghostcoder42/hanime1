@@ -1,5 +1,6 @@
 import { Icon } from '@/components/icon';
 import { StyledImage } from '@/components/native-styled';
+import { type CardOrientation, cardOrientation } from '@/lib/hanime1/images';
 import { buildUrl, endpoints } from '@/lib/hanime1/scraper';
 import { useVideoActions } from '@/lib/hooks';
 import { useActiveDownload } from '@/lib/stores/active-downloads-store';
@@ -51,12 +52,19 @@ const suppressPressOnLongPress = () => {};
  */
 function VideoTileBase({
   item,
+  orientation,
   extraActions,
-}: { item: TileItem; extraActions?: TileExtraAction[] }) {
+}: {
+  item: TileItem;
+  /** Card form; defaults to the orientation inferred from the thumbnail URL. */
+  orientation?: CardOrientation;
+  extraActions?: TileExtraAction[];
+}) {
   const router = useRouter();
   const { isFavorite, isDownloaded, isActive, toggleFavorite, toggleDownload } =
     useVideoActions(item);
   const active = useActiveDownload(item.id);
+  const form = orientation ?? cardOrientation(item.thumbnail);
 
   const openDetail = () => {
     router.push({ pathname: '/watch/[id]', params: { id: item.id } });
@@ -112,7 +120,11 @@ function VideoTileBase({
         testID="video-tile"
         className="active:opacity-80"
       >
-        <View className="relative aspect-[2/3] w-full overflow-hidden rounded-lg bg-muted">
+        <View
+          className={`relative w-full overflow-hidden rounded-lg bg-muted ${
+            form === 'portrait' ? 'aspect-[2/3]' : 'aspect-[16/9]'
+          }`}
+        >
           <StyledImage
             source={item.thumbnail}
             className="h-full w-full"
