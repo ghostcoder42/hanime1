@@ -15,7 +15,8 @@ import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
 import { Appearance, Pressable, View, useColorScheme as useRNColorScheme } from 'react-native';
-import { SafeAreaProvider } from 'react-native-safe-area-context';
+import FlashMessage from 'react-native-flash-message';
+import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
 
 SplashScreen.preventAutoHideAsync().catch(() => {});
 
@@ -36,6 +37,17 @@ function BackHeader({ onBack }: { onBack: () => void }) {
       </View>
     </SafeAreaView>
   );
+}
+
+/**
+ * Global mount for `showMessage()` (update checks, download notifications,
+ * domain switch). Without a <FlashMessage /> in the tree those toasts are
+ * silently dropped. Must live inside SafeAreaProvider; `statusBarHeight`
+ * keeps top-positioned messages below the status bar.
+ */
+function GlobalFlashMessage() {
+  const insets = useSafeAreaInsets();
+  return <FlashMessage position="top" statusBarHeight={insets.top} />;
 }
 
 export default function RootLayout() {
@@ -111,6 +123,7 @@ export default function RootLayout() {
             </ErrorBoundary>
           </GluestackUIProvider>
         </BottomSheetModalProvider>
+        <GlobalFlashMessage />
       </SafeAreaProvider>
     </FlexGestureHandlerRootView>
   );
