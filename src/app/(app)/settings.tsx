@@ -2,6 +2,7 @@ import { queryClient } from '@/api/common/query-client';
 import { ScreenErrorBoundary } from '@/components/error-boundary';
 import { Icon } from '@/components/icon';
 import { SafeAreaView } from '@/components/safe-area-view';
+import { UpdateDialog } from '@/components/update-dialog';
 import { SITE_DOMAINS, SITE_DOMAIN_KEY, type SiteDomain } from '@/lib/hanime1/endpoints';
 import { type ThemeMode, useThemeConfig } from '@/lib/hooks';
 import { useSecuritySettings } from '@/lib/hooks/use-security-settings';
@@ -246,6 +247,13 @@ export default function SettingsScreen() {
           <Text className="text-muted-foreground">{VERSION}</Text>
         </Row>
       </ScrollView>
+
+      <UpdateDialog
+        release={update.pendingRelease}
+        currentVersion={VERSION}
+        onClose={update.dismissUpdateDialog}
+        onDownload={update.openReleaseDownload}
+      />
     </SafeAreaView>
   );
 }

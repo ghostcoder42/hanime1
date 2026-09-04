@@ -90,7 +90,9 @@
     "updateAvailableMsg": "새 버전 {{version}} 사용 가능(현재 {{current}}). 지금 다운로드하시겠습니까?",
     "updateNow": "지금 업데이트",
     "updateAvailablePrefix": "새 버전",
-    "updateAvailableSuffix": "사용 가능"
+    "updateAvailableSuffix": "사용 가능",
+    "releaseDate": "릴리스",
+    "releaseNotes": "업데이트 내용:"
   },
   "actions": {
     "addToFavorites": "즐겨찾기에 추가",

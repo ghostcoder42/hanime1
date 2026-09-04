@@ -90,7 +90,9 @@
     "updateAvailableMsg": "新版本 {{version}} 已發布（目前 {{current}}），是否前往下載？",
     "updateNow": "立即更新",
     "updateAvailablePrefix": "有新版本",
-    "updateAvailableSuffix": "可供更新"
+    "updateAvailableSuffix": "可供更新",
+    "releaseDate": "發布於",
+    "releaseNotes": "更新說明："
   },
   "actions": {
     "addToFavorites": "加入收藏",

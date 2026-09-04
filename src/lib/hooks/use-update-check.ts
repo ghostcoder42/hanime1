@@ -1,10 +1,10 @@
 import { useLatestRelease } from '@/api/update-queries';
 import { useTranslate } from '@/lib/i18n/utils';
 import { useUpdateStore } from '@/lib/stores/update-store';
-import { compareVersions } from '@/lib/updates';
+import { type LatestRelease, compareVersions } from '@/lib/updates';
 import { Env } from '@env';
-import { useCallback, useEffect } from 'react';
-import { Alert, Linking, Platform } from 'react-native';
+import { useCallback, useEffect, useState } from 'react';
+import { Linking, Platform } from 'react-native';
 import { showMessage } from 'react-native-flash-message';
 
 export type UpdateCheckState = {
@@ -15,17 +15,27 @@ export type UpdateCheckState = {
   lastCheckedAt: number | undefined;
   /** True when the persisted latest version is newer than the running app. */
   hasUpdate: boolean;
-  /** Manual check: prompts when an update is available, toasts otherwise. */
+  /**
+   * Release found by the last manual check, when it is newer than the running
+   * app. Render it with <UpdateDialog />; null means no dialog.
+   */
+  pendingRelease: LatestRelease | null;
+  /** Manual check: opens the update dialog when newer, toasts otherwise. */
   check: () => Promise<void>;
-  /** Open the download (direct APK on Android, release page on iOS). */
+  dismissUpdateDialog: () => void;
+  /** Open the download for a release (direct APK on Android, page on iOS). */
+  openReleaseDownload: (release: LatestRelease) => void;
+  /** Open the download for the persisted latest release (banner-style use). */
   openDownload: () => void;
 };
 
 /**
  * GitHub-release update checker for the settings screen. The TanStack Query
  * mounts as a silent auto-check (dedup + cache), and every successful fetch
- * is persisted to the update store so the hint survives restarts. Declining
- * the prompt keeps the row hint until the installed version catches up.
+ * is persisted to the update store so the hint survives restarts. The dialog
+ * only ever opens from a manual check; the silent auto-check just refreshes
+ * the stored hint. Declining keeps the row hint until the installed version
+ * catches up.
  */
 export function useUpdateCheck(): UpdateCheckState {
   const t = useTranslate();
@@ -35,6 +45,7 @@ export function useUpdateCheck(): UpdateCheckState {
   const releaseUrl = useUpdateStore((s) => s.releaseUrl);
   const apkUrl = useUpdateStore((s) => s.apkUrl);
   const recordCheck = useUpdateStore((s) => s.recordCheck);
+  const [pendingRelease, setPendingRelease] = useState<LatestRelease | null>(null);
 
   const currentVersion = Env.VERSION ?? '0.0.0';
   const hasUpdate = !!latestVersion && compareVersions(latestVersion, currentVersion) > 0;
@@ -44,6 +55,12 @@ export function useUpdateCheck(): UpdateCheckState {
   useEffect(() => {
     if (data) recordCheck(data, dataUpdatedAt);
   }, [data, dataUpdatedAt, recordCheck]);
+
+  const openReleaseDownload = useCallback((release: LatestRelease) => {
+    const url =
+      Platform.OS === 'android' ? (release.apkUrl ?? release.releaseUrl) : release.releaseUrl;
+    if (url) void Linking.openURL(url);
+  }, []);
 
   const openDownload = useCallback(() => {
     const url = Platform.OS === 'android' ? (apkUrl ?? releaseUrl) : releaseUrl;
@@ -62,26 +79,7 @@ export function useUpdateCheck(): UpdateCheckState {
       return;
     }
     if (compareVersions(release.version, currentVersion) > 0) {
-      Alert.alert(
-        t('settings.updateAvailableTitle'),
-        t('settings.updateAvailableMsg', {
-          version: release.version,
-          current: currentVersion,
-        }),
-        [
-          { text: t('common.cancel'), style: 'cancel' },
-          {
-            text: t('settings.updateNow'),
-            onPress: () => {
-              const url =
-                Platform.OS === 'android'
-                  ? (release.apkUrl ?? release.releaseUrl)
-                  : release.releaseUrl;
-              void Linking.openURL(url);
-            },
-          },
-        ]
-      );
+      setPendingRelease(release);
     } else {
       showMessage({
         message: t('settings.upToDate'),
@@ -97,7 +95,10 @@ export function useUpdateCheck(): UpdateCheckState {
     latestVersion: latestVersion ?? undefined,
     lastCheckedAt: lastCheckedAt ?? undefined,
     hasUpdate,
+    pendingRelease,
     check,
+    dismissUpdateDialog: () => setPendingRelease(null),
+    openReleaseDownload,
     openDownload,
   };
 }
