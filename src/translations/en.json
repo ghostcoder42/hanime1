@@ -90,7 +90,9 @@
     "updateAvailableMsg": "Version {{version}} is available (current: {{current}}). Download it now?",
     "updateNow": "Update now",
     "updateAvailablePrefix": "New version",
-    "updateAvailableSuffix": "available"
+    "updateAvailableSuffix": "available",
+    "releaseDate": "Released",
+    "releaseNotes": "What's new:"
   },
   "actions": {
     "addToFavorites": "Add to favorites",
