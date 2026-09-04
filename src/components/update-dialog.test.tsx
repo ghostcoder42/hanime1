@@ -2,6 +2,13 @@ import type { LatestRelease } from '@/lib/updates';
 import { fireEvent, render } from '@testing-library/react-native';
 import { UpdateDialog } from './update-dialog';
 
+// The Modal tree flushes asynchronously through act(); on slow CI runners
+// (2-core GitHub hosted machines, suites running in parallel) that can push
+// a test past jest's default 5s timeout even though nothing is wrong — that
+// is exactly how the first post-merge CI run failed while the PR run, local
+// runs and every retry since have been green. Give this file headroom.
+jest.setTimeout(15000);
+
 const release: LatestRelease = {
   version: '0.3.0',
   releaseUrl: 'https://github.com/ghostcoder42/hanime1/releases/tag/v0.3.0',
