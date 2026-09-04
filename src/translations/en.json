@@ -83,12 +83,14 @@
     "version": "Version",
     "checkUpdates": "Check for updates",
     "checkNow": "Check",
+    "checking": "Checking…",
     "upToDate": "You're on the latest version",
     "updateCheckFailed": "Failed to check for updates",
     "updateAvailableTitle": "Update available",
     "updateAvailableMsg": "Version {{version}} is available (current: {{current}}). Download it now?",
     "updateNow": "Update now",
-    "updateAvailableHint": "New version {{version}} available"
+    "updateAvailablePrefix": "New version",
+    "updateAvailableSuffix": "available"
   },
   "actions": {
     "addToFavorites": "Add to favorites",

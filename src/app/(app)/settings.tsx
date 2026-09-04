@@ -1,5 +1,6 @@
 import { queryClient } from '@/api/common/query-client';
 import { ScreenErrorBoundary } from '@/components/error-boundary';
+import { Icon } from '@/components/icon';
 import { SafeAreaView } from '@/components/safe-area-view';
 import { SITE_DOMAINS, SITE_DOMAIN_KEY, type SiteDomain } from '@/lib/hanime1/endpoints';
 import { type ThemeMode, useThemeConfig } from '@/lib/hooks';
@@ -51,7 +52,8 @@ function Row({
   children,
 }: {
   label: string;
-  description?: string;
+  /** Plain string gets the standard muted style; a node renders as-is (rich text). */
+  description?: React.ReactNode;
   children: React.ReactNode;
 }) {
   return (
@@ -59,7 +61,11 @@ function Row({
       <View className="max-w-[60%]">
         <Text className="text-foreground">{label}</Text>
         {description ? (
-          <Text className="mt-0.5 text-xs text-muted-foreground">{description}</Text>
+          typeof description === 'string' ? (
+            <Text className="mt-0.5 text-xs text-muted-foreground">{description}</Text>
+          ) : (
+            description
+          )
         ) : null}
       </View>
       <View className="flex-row">{children}</View>
@@ -207,18 +213,33 @@ export default function SettingsScreen() {
           <Row
             label={t('settings.checkUpdates')}
             description={
-              update.hasUpdate
-                ? t('settings.updateAvailableHint', { version: update.latestVersion ?? '' })
-                : undefined
+              update.hasUpdate ? (
+                <Text className="mt-0.5 text-xs text-muted-foreground">
+                  {t('settings.updateAvailablePrefix')}{' '}
+                  <Text className="font-semibold text-rose-500">{update.latestVersion}</Text>{' '}
+                  {t('settings.updateAvailableSuffix')}
+                </Text>
+              ) : undefined
             }
           >
-            {update.checking ? (
-              <ActivityIndicator size="small" color="#fb7185" />
-            ) : update.hasUpdate ? (
-              <Text className="text-rose-500">{update.latestVersion}</Text>
-            ) : (
-              <Text className="text-muted-foreground">{t('settings.checkNow')}</Text>
-            )}
+            {/* Pill-shaped button so the row reads as actionable (the old muted
+                text looked disabled); swaps to a spinner + "checking" label
+                while the request is in flight. View, not Pressable — the whole
+                row is the tap target. */}
+            <View
+              className={`flex-row items-center gap-1.5 rounded-full px-3 py-1.5 ${
+                update.checking ? 'bg-muted' : 'bg-primary'
+              }`}
+            >
+              {update.checking ? (
+                <ActivityIndicator size="small" color="#fb7185" />
+              ) : (
+                <Icon name="refresh" size={16} color="white" />
+              )}
+              <Text className={update.checking ? 'text-foreground' : 'text-primary-foreground'}>
+                {t(update.checking ? 'settings.checking' : 'settings.checkNow')}
+              </Text>
+            </View>
           </Row>
         </Pressable>
         <Row label={t('settings.version')}>

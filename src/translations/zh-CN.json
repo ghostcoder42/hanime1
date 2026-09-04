@@ -83,12 +83,14 @@
     "version": "版本",
     "checkUpdates": "检查更新",
     "checkNow": "检查",
+    "checking": "检查中",
     "upToDate": "已是最新版本",
     "updateCheckFailed": "检查更新失败",
     "updateAvailableTitle": "发现新版本",
     "updateAvailableMsg": "新版本 {{version}} 已发布（当前 {{current}}），是否前往下载？",
     "updateNow": "立即更新",
-    "updateAvailableHint": "有新版本 {{version}} 可供更新"
+    "updateAvailablePrefix": "有新版本",
+    "updateAvailableSuffix": "可供更新"
   },
   "actions": {
     "addToFavorites": "加入收藏",
