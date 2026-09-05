@@ -1,6 +1,6 @@
 {
   "name": "hanime1",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "main": "expo-router/entry",
   "dependencies": {
     "@expo/html-elements": "^0.12.5",
