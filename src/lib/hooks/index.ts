@@ -5,6 +5,7 @@ export {
   PORTRAIT_MIN_TILE_WIDTH,
   useColumns,
 } from './use-columns';
+export { usePlaybackSettings } from './use-playback-settings';
 export { useSearchHistory } from './use-search-history';
 export { useUpdateCheck, type UpdateCheckState } from './use-update-check';
 export { useVideoActions, type ActionableItem } from './use-video-actions';

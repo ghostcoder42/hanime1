@@ -6,7 +6,7 @@ import { SafeAreaView } from '@/components/safe-area-view';
 import { toOfflineDetail } from '@/lib/download/offline-detail';
 import { buildUrl, endpoints } from '@/lib/hanime1/scraper';
 import { haptic, hapticSuccess } from '@/lib/haptics';
-import { useVideoDownload } from '@/lib/hooks';
+import { usePlaybackSettings, useVideoDownload } from '@/lib/hooks';
 import { useTranslate } from '@/lib/i18n/utils';
 import {
   useDownloadedStore,
@@ -78,6 +78,22 @@ export default function WatchScreen() {
     p.loop = true;
   });
   const { isPlaying } = useEvent(player, 'playingChange', { isPlaying: player.playing });
+
+  const { autoplay } = usePlaybackSettings();
+
+  // Start playback automatically when the screen is entered or the source
+  // changes (new video via the stack, or a resolution switch) unless the
+  // user opted out in Settings. Coming back from a deeper screen (author /
+  // tag) stays paused — the focus cleanup below paused it on leave.
+  // biome-ignore lint/correctness/useExhaustiveDependencies: videoSource is an intentional trigger — replay when the source lands or switches.
+  useEffect(() => {
+    if (!autoplay) return;
+    try {
+      player.play();
+    } catch {
+      // Player not attached to a source yet — replays when videoSource lands.
+    }
+  }, [autoplay, player, videoSource]);
 
   // Pause when this screen loses focus (opening the author page, a tag page or
   // another video keeps this screen mounted in the stack — without this, its
