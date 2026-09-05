@@ -4,7 +4,7 @@ import { Icon } from '@/components/icon';
 import { SafeAreaView } from '@/components/safe-area-view';
 import { UpdateDialog } from '@/components/update-dialog';
 import { SITE_DOMAINS, SITE_DOMAIN_KEY, type SiteDomain } from '@/lib/hanime1/endpoints';
-import { type ThemeMode, useThemeConfig } from '@/lib/hooks';
+import { type ThemeMode, usePlaybackSettings, useThemeConfig } from '@/lib/hooks';
 import { useSecuritySettings } from '@/lib/hooks/use-security-settings';
 import { useUpdateCheck } from '@/lib/hooks/use-update-check';
 import { LANGUAGE_LABELS, type Language } from '@/lib/i18n/resources';
@@ -16,7 +16,15 @@ import { Env } from '@env';
 // bundles (binding missing at runtime), destructuring after import works.
 import * as ApplicationNS from 'expo-application';
 import { ActivityAction, startActivityAsync } from 'expo-intent-launcher';
-import { ActivityIndicator, Platform, Pressable, ScrollView, Text, View } from 'react-native';
+import {
+  ActivityIndicator,
+  Platform,
+  Pressable,
+  ScrollView,
+  Switch,
+  Text,
+  View,
+} from 'react-native';
 import { showMessage } from 'react-native-flash-message';
 import { useMMKVString } from 'react-native-mmkv';
 
@@ -106,6 +114,7 @@ export { ScreenErrorBoundary as ErrorBoundary };
 export default function SettingsScreen() {
   const t = useTranslate();
   const [theme, setTheme] = useThemeConfig();
+  const { autoplay, setAutoplay } = usePlaybackSettings();
   const [domain, setDomain] = useMMKVString(SITE_DOMAIN_KEY);
   const [lang, setLang] = useSelectedLanguage();
   const clearHistory = useHistoryStore((s) => s.clearHistory);
@@ -138,6 +147,15 @@ export default function SettingsScreen() {
               onPress={() => setTheme(mode)}
             />
           ))}
+        </Row>
+
+        <SectionTitle>{t('settings.playback')}</SectionTitle>
+        <Row label={t('settings.autoplay')} description={t('settings.autoplayDesc')}>
+          <Switch
+            value={autoplay}
+            onValueChange={setAutoplay}
+            trackColor={{ true: '#f43f5e', false: '#a1a1aa' }}
+          />
         </Row>
 
         <SectionTitle>{t('settings.domain')}</SectionTitle>
