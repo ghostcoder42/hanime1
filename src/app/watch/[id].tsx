@@ -337,7 +337,7 @@ function DownloadButton({ state }: { state: ReturnType<typeof useVideoDownload> 
         className="flex-row items-center gap-1.5 rounded-full bg-destructive px-3 py-1.5"
       >
         <Icon name="alert-circle" size={16} color="white" />
-        <Text className="text-white">{t('detail.retry')}</Text>
+        <Text className="text-white">{t('common.resume')}</Text>
       </Pressable>
     );
   }

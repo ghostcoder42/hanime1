@@ -3,6 +3,8 @@
     "appName": "HAnime1",
     "loading": "Loading…",
     "retry": "Retry",
+    "pause": "Pause",
+    "resume": "Resume",
     "error": "Something went wrong",
     "empty": "Nothing here yet",
     "noResults": "No results found",
@@ -46,6 +48,7 @@
     "removeHistory": "Remove from history",
     "downloading": "Downloading",
     "failed": "Failed",
+    "paused": "Paused",
     "cancelled": "Cancelled",
     "deleteDownloadTitle": "Delete download",
     "deleteDownloadMsg": "Remove \"{{title}}\" from downloads?"
@@ -58,8 +61,7 @@
     "views": "views",
     "uploaded": "Uploaded",
     "tags": "Tags",
-    "play": "Play",
-    "retry": "Tap to retry"
+    "play": "Play"
   },
   "settings": {
     "title": "Settings",

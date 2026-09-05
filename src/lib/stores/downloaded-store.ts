@@ -7,6 +7,7 @@ import {
   reconcileDownloads,
 } from '@/lib/download';
 import { create } from 'zustand';
+import { useActiveDownloadsStore } from './active-downloads-store';
 
 type DownloadedStore = {
   downloads: DownloadMetadata[];
@@ -26,8 +27,12 @@ export const useDownloadedStore = create<DownloadedStore>((set, get) => ({
   loaded: false,
 
   hydrate: async () => {
-    // Remove orphaned on-disk files (no metadata) before reading the map.
-    await reconcileDownloads();
+    // Tasks persisted as in-flight died with the previous process — mark
+    // them retryable first, so the orphan cleanup below spares their partial
+    // files (those are the resume points).
+    useActiveDownloadsStore.getState().restoreInterrupted();
+    const activeIds = new Set(Object.keys(useActiveDownloadsStore.getState().tasks));
+    await reconcileDownloads(activeIds);
     const downloads = getAllDownloads();
     set({
       downloads,

@@ -4,7 +4,7 @@ import { StyledImage } from '@/components/native-styled';
 import { SafeAreaView } from '@/components/safe-area-view';
 import { VideoGrid } from '@/components/video-grid';
 import type { DownloadMetadata } from '@/lib/download';
-import { cancelDownload } from '@/lib/download/download-video';
+import { cancelDownload, pauseDownload, retryDownload } from '@/lib/download/download-video';
 import type { TxKeyPath } from '@/lib/i18n/types';
 import { useTranslate } from '@/lib/i18n/utils';
 import { useDownloadedStore, useFavoritesStore, useHistoryStore } from '@/lib/stores';
@@ -95,24 +95,44 @@ function formatDate(ts: number): string {
 
 function ActiveDownloadRow({ task }: { task: ActiveDownload }) {
   const t = useTranslate();
-  const [cancelling, setCancelling] = useState(false);
+  const [busy, setBusy] = useState(false);
   const indeterminate = task.progress < 0;
   const pct = indeterminate ? 0 : Math.round(task.progress * 100);
   const barWidth = indeterminate ? 40 : pct;
+  const errored = task.status === 'error';
+  const paused = task.status === 'paused';
 
   const onCancel = async () => {
-    setCancelling(true);
+    setBusy(true);
     await cancelDownload(task.videoId);
+  };
+
+  // A failed task is removed (and its partial file cleaned) via the same
+  // cancel path — there is no resumable left, it just clears the task.
+  const onRetry = async () => {
+    setBusy(true);
+    const restarted = await retryDownload(task.videoId);
+    // false = still offline / source gone; the task stays errored so the
+    // user can delete it instead.
+    if (!restarted) setBusy(false);
+  };
+
+  const onPause = async () => {
+    setBusy(true);
+    await pauseDownload(task.videoId);
+    setBusy(false);
   };
 
   const statusText =
     task.status === 'error'
       ? `${t('library.failed')}${task.error ? `: ${task.error}` : ''}`
-      : task.status === 'cancelled'
-        ? t('library.cancelled')
-        : indeterminate
-          ? `${t('library.downloading')}…`
-          : `${t('library.downloading')} · ${pct}%`;
+      : paused
+        ? t('library.paused')
+        : task.status === 'cancelled'
+          ? t('library.cancelled')
+          : indeterminate
+            ? `${t('library.downloading')}…`
+            : `${t('library.downloading')} · ${pct}%`;
 
   return (
     <View className="flex-row items-center px-4 py-2" testID="active-download-row">
@@ -128,21 +148,60 @@ function ActiveDownloadRow({ task }: { task: ActiveDownload }) {
         <Text className="text-xs text-muted-foreground">{statusText}</Text>
         <View className="mt-1 h-1.5 overflow-hidden rounded-full bg-muted">
           <View
-            className={task.status === 'error' ? 'h-full bg-destructive' : 'h-full bg-sky-500'}
+            className={
+              task.status === 'error'
+                ? 'h-full bg-destructive'
+                : paused
+                  ? 'h-full bg-muted-foreground/50'
+                  : 'h-full bg-sky-500'
+            }
             style={{ width: `${barWidth}%` }}
           />
         </View>
       </View>
-      <Pressable
-        onPress={onCancel}
-        disabled={cancelling || task.status === 'cancelled'}
-        className="ml-2 items-center justify-center rounded-full bg-muted px-3 py-1.5"
-        testID="active-download-cancel"
-      >
-        <Text className="text-xs font-medium text-foreground">
-          {cancelling ? '…' : t('common.cancel')}
-        </Text>
-      </Pressable>
+      {errored || paused ? (
+        <View className="ml-2 flex-row gap-2">
+          <Pressable
+            onPress={onRetry}
+            disabled={busy}
+            className="items-center justify-center rounded-full bg-primary px-3 py-1.5"
+            testID="active-download-resume"
+          >
+            <Text className="text-xs font-medium text-primary-foreground">
+              {busy ? '…' : t('common.resume')}
+            </Text>
+          </Pressable>
+          <Pressable
+            onPress={onCancel}
+            disabled={busy}
+            className="items-center justify-center rounded-full bg-muted px-3 py-1.5"
+            testID="active-download-delete"
+          >
+            <Text className="text-xs font-medium text-foreground">{t('common.delete')}</Text>
+          </Pressable>
+        </View>
+      ) : (
+        <View className="ml-2 flex-row gap-2">
+          <Pressable
+            onPress={onPause}
+            disabled={busy || task.status !== 'downloading'}
+            className="items-center justify-center rounded-full bg-muted px-3 py-1.5"
+            testID="active-download-pause"
+          >
+            <Text className="text-xs font-medium text-foreground">{t('common.pause')}</Text>
+          </Pressable>
+          <Pressable
+            onPress={onCancel}
+            disabled={busy || task.status === 'cancelled'}
+            className="items-center justify-center rounded-full bg-muted px-3 py-1.5"
+            testID="active-download-cancel"
+          >
+            <Text className="text-xs font-medium text-foreground">
+              {busy ? '…' : t('common.cancel')}
+            </Text>
+          </Pressable>
+        </View>
+      )}
     </View>
   );
 }
