@@ -3,6 +3,8 @@
     "appName": "HAnime1",
     "loading": "载入中…",
     "retry": "重试",
+    "pause": "暂停",
+    "resume": "继续",
     "error": "发生错误",
     "empty": "目前没有内容",
     "noResults": "找不到结果",
@@ -46,6 +48,7 @@
     "removeHistory": "删除观看记录",
     "downloading": "下载中",
     "failed": "失败",
+    "paused": "已暂停",
     "cancelled": "已取消",
     "deleteDownloadTitle": "删除下载",
     "deleteDownloadMsg": "从下载中移除「{{title}}」？"
@@ -58,8 +61,7 @@
     "views": "次观看",
     "uploaded": "上架",
     "tags": "标签",
-    "play": "播放",
-    "retry": "点击重试"
+    "play": "播放"
   },
   "settings": {
     "title": "设置",

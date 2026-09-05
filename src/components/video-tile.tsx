@@ -1,5 +1,6 @@
 import { Icon } from '@/components/icon';
 import { StyledImage } from '@/components/native-styled';
+import { retryDownload } from '@/lib/download/download-video';
 import { type CardOrientation, cardOrientation } from '@/lib/hanime1/images';
 import { buildUrl, endpoints } from '@/lib/hanime1/scraper';
 import { useVideoActions } from '@/lib/hooks';
@@ -87,9 +88,19 @@ function VideoTileBase({
         },
         {
           id: 'download',
-          title: isActive ? 'Downloading…' : isDownloaded ? 'Downloaded' : 'Download',
+          title:
+            active?.status === 'error' || active?.status === 'paused'
+              ? 'Resume download'
+              : isActive
+                ? 'Downloading…'
+                : isDownloaded
+                  ? 'Downloaded'
+                  : 'Download',
           image: 'arrow.down.circle',
-          attributes: isActive || isDownloaded ? { disabled: true } : undefined,
+          attributes:
+            isActive && active?.status !== 'error' && active?.status !== 'paused'
+              ? { disabled: true }
+              : undefined,
         },
         {
           id: 'share',
@@ -103,7 +114,11 @@ function VideoTileBase({
         if (ev === 'favorite') {
           toggleFavorite();
         } else if (ev === 'download') {
-          void toggleDownload();
+          if (active?.status === 'error' || active?.status === 'paused') {
+            void retryDownload(item.id);
+          } else {
+            void toggleDownload();
+          }
         } else if (ev === 'share') {
           void Share.share({
             url: buildUrl(endpoints.watch(item.id)),

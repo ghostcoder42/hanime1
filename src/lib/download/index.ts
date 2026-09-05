@@ -77,10 +77,11 @@ export function localUriFor(videoId: string): string {
 
 /**
  * Orphan cleanup: deletes on-disk `.mp4` files in the videos/ directory that
- * have no metadata entry (left over from interrupted or legacy downloads).
- * Returns the videoIds that were removed. Safe to run repeatedly.
+ * have no metadata entry and no active task (a half-download belonging to a
+ * persisted task is the resume point — it must survive). Returns the videoIds
+ * that were removed. Safe to run repeatedly.
  */
-export async function reconcileDownloads(): Promise<string[]> {
+export async function reconcileDownloads(excludeIds: Set<string> = new Set()): Promise<string[]> {
   const map = readMap();
   const removed: string[] = [];
   let dirInfo: FileSystem.FileInfo;
@@ -101,7 +102,7 @@ export async function reconcileDownloads(): Promise<string[]> {
   for (const name of entries) {
     if (!name.endsWith('.mp4')) continue;
     const videoId = name.slice(0, -'.mp4'.length);
-    if (!(videoId in map)) {
+    if (!(videoId in map) && !excludeIds.has(videoId)) {
       try {
         await FileSystem.deleteAsync(`${DOWNLOAD_DIR}${name}`, { idempotent: true });
         removed.push(videoId);

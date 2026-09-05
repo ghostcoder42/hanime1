@@ -3,6 +3,8 @@
     "appName": "HAnime1",
     "loading": "불러오는 중…",
     "retry": "다시 시도",
+    "pause": "일시정지",
+    "resume": "계속",
     "error": "문제가 발생했습니다",
     "empty": "아직 항목이 없습니다",
     "noResults": "결과를 찾을 수 없습니다",
@@ -46,6 +48,7 @@
     "removeHistory": "기록에서 삭제",
     "downloading": "다운로드 중",
     "failed": "실패",
+    "paused": "일시정지됨",
     "cancelled": "취소됨",
     "deleteDownloadTitle": "다운로드 삭제",
     "deleteDownloadMsg": "다운로드에서 「{{title}}」을(를) 삭제하시겠습니까?"
@@ -58,8 +61,7 @@
     "views": "회 시청",
     "uploaded": "업로드",
     "tags": "태그",
-    "play": "재생",
-    "retry": "탭하여 다시 시도"
+    "play": "재생"
   },
   "settings": {
     "title": "설정",
