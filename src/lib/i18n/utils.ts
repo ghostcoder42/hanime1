@@ -1,5 +1,4 @@
 import { storage } from '@/lib/storage';
-import { getLocales } from 'expo-localization';
 import { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useMMKVString } from 'react-native-mmkv';
@@ -13,19 +12,14 @@ export function isLanguage(value: string | null | undefined): value is Language 
   return !!value && (languages as readonly string[]).includes(value);
 }
 
+/**
+ * The default language — what applies when the user hasn't picked one.
+ * Reads the i18n instance instead of re-deriving from the device locale, so
+ * the selector highlights exactly what is rendered (the locale mapping lives
+ * only in ./index's initialLanguage).
+ */
 export function getDefaultLanguage(): Language {
-  const loc = getLocales()[0];
-  if (!loc) return 'en';
-  // Chinese needs script/region disambiguation (languageCode is just 'zh'):
-  // Hans script or CN/SG/MY region → Simplified, otherwise Traditional.
-  const tag = (loc.languageTag ?? '').toLowerCase();
-  if (tag.startsWith('zh')) {
-    return tag.includes('hans') || tag.includes('cn') || tag.includes('sg') || tag.includes('my')
-      ? 'zh-CN'
-      : 'zh';
-  }
-  const code = loc.languageCode;
-  return isLanguage(code) ? code : 'en';
+  return isLanguage(i18n.language) ? i18n.language : 'en';
 }
 
 /** Read the selected language synchronously (safe at i18n init time). */
