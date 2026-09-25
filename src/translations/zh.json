@@ -61,7 +61,8 @@
     "views": "次觀看",
     "uploaded": "上架",
     "tags": "標籤",
-    "play": "播放"
+    "play": "播放",
+    "videoRemoved": "此影片已從網站移除"
   },
   "settings": {
     "title": "設定",

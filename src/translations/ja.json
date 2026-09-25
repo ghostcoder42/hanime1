@@ -61,7 +61,8 @@
     "views": "回視聴",
     "uploaded": "投稿",
     "tags": "タグ",
-    "play": "再生"
+    "play": "再生",
+    "videoRemoved": "この動画はサイトから削除されました"
   },
   "settings": {
     "title": "設定",
