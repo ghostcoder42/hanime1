@@ -97,7 +97,9 @@
     "updateAvailablePrefix": "有新版本",
     "updateAvailableSuffix": "可供更新",
     "releaseDate": "發布於",
-    "releaseNotes": "更新說明："
+    "releaseNotes": "更新說明：",
+    "errorLog": "錯誤日誌",
+    "errorLogDescription": "檢視最近的網路錯誤詳情，可複製"
   },
   "actions": {
     "addToFavorites": "加入收藏",
@@ -106,5 +108,23 @@
     "share": "分享",
     "followAuthor": "追蹤作者",
     "unfollowAuthor": "取消追蹤作者"
+  },
+  "errors": {
+    "timeout": "請求逾時——網路太慢或站點無回應",
+    "blocked": "存取被拒（{{status}}）——目前網路/IP 可能被站點防火牆（Cloudflare）攔截",
+    "notFound": "內容不存在或已被刪除（404）",
+    "serverError": "站點伺服器錯誤（{{status}}）",
+    "httpError": "請求被拒（{{status}}）",
+    "offline": "裝置無法連線網際網路，請檢查網路",
+    "unreachable": "網路正常，但無法連線站點——目前 IP/區域可能被站點封鎖，或連線受干擾",
+    "unknown": "發生未知錯誤"
+  },
+  "logs": {
+    "title": "錯誤日誌",
+    "empty": "尚無錯誤日誌",
+    "share": "分享",
+    "clear": "清空",
+    "cleared": "日誌已清空",
+    "copyHint": "長按文字即可選取複製；分享可匯出整個日誌。"
   }
 }

@@ -97,7 +97,9 @@
     "updateAvailablePrefix": "有新版本",
     "updateAvailableSuffix": "可供更新",
     "releaseDate": "发布于",
-    "releaseNotes": "更新说明："
+    "releaseNotes": "更新说明：",
+    "errorLog": "错误日志",
+    "errorLogDescription": "查看最近的网络错误详情，可复制"
   },
   "actions": {
     "addToFavorites": "加入收藏",
@@ -106,5 +108,23 @@
     "share": "分享",
     "followAuthor": "追踪作者",
     "unfollowAuthor": "取消追踪作者"
+  },
+  "errors": {
+    "timeout": "请求超时——网络太慢或站点无响应",
+    "blocked": "访问被拒绝（{{status}}）——当前网络/IP 可能被站点防火墙（Cloudflare）拦截",
+    "notFound": "内容不存在或已被删除（404）",
+    "serverError": "站点服务器错误（{{status}}）",
+    "httpError": "请求被拒绝（{{status}}）",
+    "offline": "设备无法连接互联网，请检查网络",
+    "unreachable": "网络正常，但无法连接到站点——当前 IP/区域可能被站点屏蔽，或连接被干扰",
+    "unknown": "发生未知错误"
+  },
+  "logs": {
+    "title": "错误日志",
+    "empty": "暂无错误日志",
+    "share": "分享",
+    "clear": "清空",
+    "cleared": "日志已清空",
+    "copyHint": "长按文字即可选中复制；分享可导出整个日志。"
   }
 }

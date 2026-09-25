@@ -97,7 +97,9 @@
     "updateAvailablePrefix": "New version",
     "updateAvailableSuffix": "available",
     "releaseDate": "Released",
-    "releaseNotes": "What's new:"
+    "releaseNotes": "What's new:",
+    "errorLog": "Error log",
+    "errorLogDescription": "View recent network errors (copyable)"
   },
   "actions": {
     "addToFavorites": "Add to favorites",
@@ -106,5 +108,23 @@
     "share": "Share",
     "followAuthor": "Follow author",
     "unfollowAuthor": "Unfollow author"
+  },
+  "errors": {
+    "timeout": "Request timed out — the network is too slow or the site is unresponsive",
+    "blocked": "Access denied ({{status}}) — your network/IP is probably blocked by the site firewall (Cloudflare)",
+    "notFound": "Content doesn't exist or was removed (404)",
+    "serverError": "Site server error ({{status}})",
+    "httpError": "Request rejected ({{status}})",
+    "offline": "No internet connection — check your network",
+    "unreachable": "Internet works, but the site cannot be reached — your IP/region may be blocked or the connection is being interfered with",
+    "unknown": "Unknown error"
+  },
+  "logs": {
+    "title": "Error log",
+    "empty": "No errors yet",
+    "share": "Share",
+    "clear": "Clear",
+    "cleared": "Log cleared",
+    "copyHint": "Long-press the text to select and copy; Share sends the whole log."
   }
 }

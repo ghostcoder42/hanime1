@@ -11,6 +11,7 @@ import {
 import { VideoGrid } from '@/components/video-grid';
 import { GENRES, SORTS } from '@/lib/hanime1/types';
 import { useTranslate } from '@/lib/i18n/utils';
+import { networkErrorMessage } from '@/lib/network/errors';
 import type { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { useFocusEffect } from 'expo-router';
 import { useCallback, useEffect, useRef, useState } from 'react';
@@ -55,16 +56,24 @@ export default function BrowseScreen() {
 
   // Default browse = genre only (no query, no sort), matching the site. Query is
   // added only when typing; sort/tags/broad only when set in the filter sheet.
-  const { data, fetchNextPage, isFetchingNextPage, isLoading, refetch, isFetching } =
-    useSearchVideos({
-      variables: {
-        genre,
-        sort: filter.sortKey ? SORTS[filter.sortKey] : undefined,
-        query: debounced || undefined,
-        tags: filter.tags.length > 0 ? filter.tags : undefined,
-        broad: filter.broad || undefined,
-      },
-    });
+  const {
+    data,
+    fetchNextPage,
+    isFetchingNextPage,
+    isLoading,
+    refetch,
+    isFetching,
+    isError,
+    error,
+  } = useSearchVideos({
+    variables: {
+      genre,
+      sort: filter.sortKey ? SORTS[filter.sortKey] : undefined,
+      query: debounced || undefined,
+      tags: filter.tags.length > 0 ? filter.tags : undefined,
+      broad: filter.broad || undefined,
+    },
+  });
 
   useFocusEffect(useCallback(() => {}, []));
 
@@ -122,6 +131,8 @@ export default function BrowseScreen() {
         isRefreshing={isFetching && !isLoading}
         isFetchingNextPage={isFetchingNextPage}
         isLoading={isLoading}
+        errorText={isError ? networkErrorMessage(error, t) : undefined}
+        onRetry={() => refetch()}
         contentContainerStyle={{ paddingBottom: 24 }}
       />
 
