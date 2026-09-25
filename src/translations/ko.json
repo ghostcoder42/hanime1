@@ -97,7 +97,9 @@
     "updateAvailablePrefix": "새 버전",
     "updateAvailableSuffix": "사용 가능",
     "releaseDate": "릴리스",
-    "releaseNotes": "업데이트 내용:"
+    "releaseNotes": "업데이트 내용:",
+    "errorLog": "오류 로그",
+    "errorLogDescription": "최근 네트워크 오류 보기(복사 가능)"
   },
   "actions": {
     "addToFavorites": "즐겨찾기에 추가",
@@ -116,5 +118,13 @@
     "offline": "인터넷에 연결할 수 없습니다 — 네트워크를 확인하세요",
     "unreachable": "인터넷은 정상이지만 사이트에 연결할 수 없습니다 — IP/지역이 차단되었거나 연결이 방해받고 있을 수 있습니다",
     "unknown": "알 수 없는 오류"
+  },
+  "logs": {
+    "title": "오류 로그",
+    "empty": "아직 오류가 없습니다",
+    "share": "공유",
+    "clear": "지우기",
+    "cleared": "로그를 지웠습니다",
+    "copyHint": "텍스트를 길게 눌러 선택하고 복사할 수 있습니다. 공유로 전체 로그를 보낼 수 있습니다."
   }
 }

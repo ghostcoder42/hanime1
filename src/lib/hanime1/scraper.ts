@@ -8,6 +8,7 @@
  * named captures the way V8 does. We therefore use **positional** capture
  * groups (`match[1..n]`) exclusively and avoid `.groups`.
  */
+import { appendErrorLog } from '@/lib/logs/error-log';
 import {
   AppNetworkError,
   classifyHttpStatus,
@@ -31,10 +32,21 @@ function forEachMatch(input: string, pattern: RegExp, cb: (m: RegExpExecArray) =
   }
 }
 
+/** Record a failure in the error-log file (see Settings → Error log). */
+function logNetworkError(err: AppNetworkError): void {
+  void appendErrorLog({
+    kind: err.kind,
+    status: err.status,
+    url: err.url,
+    detail: err.detail || err.message,
+  });
+}
+
 /**
  * Fetch a page as text with a desktop UA + timeout. Failures are classified
  * (timeout / Cloudflare block / offline / site-unreachable / …) into
- * `AppNetworkError`s the UI can render specific messages for.
+ * `AppNetworkError`s the UI can render specific messages for, and recorded
+ * in the in-app error log.
  */
 export async function fetchPage(pathOrUrl: string): Promise<string> {
   const url = pathOrUrl.startsWith('http') ? pathOrUrl : buildUrl(pathOrUrl);
@@ -57,12 +69,14 @@ export async function fetchPage(pathOrUrl: string): Promise<string> {
         url,
         detail: httpErrorDetail({ status: res.status, body }),
       });
+      logNetworkError(err);
       throw err;
     }
     return await res.text();
   } catch (err) {
     if (err instanceof AppNetworkError) throw err;
     const appErr = await classifyTransportError(err, url);
+    logNetworkError(appErr);
     throw appErr;
   } finally {
     clearTimeout(timeout);

@@ -97,7 +97,9 @@
     "updateAvailablePrefix": "新しいバージョン",
     "updateAvailableSuffix": "があります",
     "releaseDate": "リリース日",
-    "releaseNotes": "更新内容："
+    "releaseNotes": "更新内容：",
+    "errorLog": "エラーログ",
+    "errorLogDescription": "最近のネットワークエラーを表示（コピー可能）"
   },
   "actions": {
     "addToFavorites": "お気に入りに追加",
@@ -116,5 +118,13 @@
     "offline": "インターネットに接続できません——ネットワークを確認してください",
     "unreachable": "インターネットは利用できますが、サイトに接続できません——IP/地域がブロックされているか、接続が妨害されている可能性があります",
     "unknown": "不明なエラー"
+  },
+  "logs": {
+    "title": "エラーログ",
+    "empty": "エラーはまだありません",
+    "share": "共有",
+    "clear": "クリア",
+    "cleared": "ログを消去しました",
+    "copyHint": "テキストを長押しで選択してコピーできます。共有でログ全体を送れます。"
   }
 }
