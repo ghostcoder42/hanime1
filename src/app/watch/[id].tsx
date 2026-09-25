@@ -17,7 +17,7 @@ import {
 import { useEvent } from 'expo';
 import { Link, useFocusEffect, useLocalSearchParams } from 'expo-router';
 import { useVideoPlayer } from 'expo-video';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { ActivityIndicator, Pressable, ScrollView, Share, Text, View } from 'react-native';
 
 export { ScreenErrorBoundary as ErrorBoundary };
@@ -81,13 +81,20 @@ export default function WatchScreen() {
 
   const { autoplay } = usePlaybackSettings();
 
+  // Focus guard for the slow-network case: the detail query can resolve long
+  // after the user has backed out of this screen (it stays mounted in the
+  // stack). Firing play() then would start a player that was never attached
+  // to a view — or play audio underneath the previous screen — so autoplay
+  // must only run while this screen actually has focus.
+  const isFocusedRef = useRef(true);
+
   // Start playback automatically when the screen is entered or the source
   // changes (new video via the stack, or a resolution switch) unless the
   // user opted out in Settings. Coming back from a deeper screen (author /
   // tag) stays paused — the focus cleanup below paused it on leave.
   // biome-ignore lint/correctness/useExhaustiveDependencies: videoSource is an intentional trigger — replay when the source lands or switches.
   useEffect(() => {
-    if (!autoplay) return;
+    if (!autoplay || !isFocusedRef.current) return;
     try {
       player.play();
     } catch {
@@ -102,7 +109,9 @@ export default function WatchScreen() {
   // "shared object already released", which is safe to ignore.
   useFocusEffect(
     useCallback(() => {
+      isFocusedRef.current = true;
       return () => {
+        isFocusedRef.current = false;
         try {
           player.pause();
         } catch {
