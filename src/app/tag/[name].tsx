@@ -15,7 +15,7 @@ export default function TagScreen() {
   // text — the `tags[]` filter knows nothing about them.
   const searchTags = params.type === 'query' ? undefined : [name];
   const query = params.type === 'query' ? name : undefined;
-  const { data, fetchNextPage, isFetchingNextPage, isLoading, refetch, isFetching } =
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading, refetch, isFetching } =
     useSearchVideos({ variables: { tags: searchTags, query } });
 
   const items = useMemo(() => data?.pages.flatMap((p) => p.items) ?? [], [data]);
@@ -29,7 +29,9 @@ export default function TagScreen() {
       </View>
       <VideoGrid
         items={items}
-        onEndReached={() => fetchNextPage()}
+        onEndReached={() => {
+          if (hasNextPage && !isFetchingNextPage) void fetchNextPage();
+        }}
         onRefresh={() => refetch()}
         isRefreshing={isFetching && !isLoading}
         isFetchingNextPage={isFetchingNextPage}

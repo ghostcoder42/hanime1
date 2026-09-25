@@ -55,7 +55,7 @@ export default function BrowseScreen() {
 
   // Default browse = genre only (no query, no sort), matching the site. Query is
   // added only when typing; sort/tags/broad only when set in the filter sheet.
-  const { data, fetchNextPage, isFetchingNextPage, isLoading, refetch, isFetching } =
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading, refetch, isFetching } =
     useSearchVideos({
       variables: {
         genre,
@@ -117,7 +117,12 @@ export default function BrowseScreen() {
 
       <VideoGrid
         items={items}
-        onEndReached={() => fetchNextPage()}
+        onEndReached={() => {
+          // Short lists fire onEndReached repeatedly (especially with one
+          // row of results); without the guard each fire queues another
+          // page fetch and walks the whole site on a struggling network.
+          if (hasNextPage && !isFetchingNextPage) void fetchNextPage();
+        }}
         onRefresh={() => refetch()}
         isRefreshing={isFetching && !isLoading}
         isFetchingNextPage={isFetchingNextPage}
