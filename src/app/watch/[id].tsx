@@ -8,6 +8,7 @@ import { buildUrl, endpoints } from '@/lib/hanime1/scraper';
 import { haptic, hapticSuccess } from '@/lib/haptics';
 import { usePlaybackSettings, useVideoDownload } from '@/lib/hooks';
 import { useTranslate } from '@/lib/i18n/utils';
+import { endVideoOpen } from '@/lib/navigation/open-guard';
 import {
   useDownloadedStore,
   useFavoritesStore,
@@ -17,7 +18,7 @@ import {
 import { useEvent } from 'expo';
 import { Link, useFocusEffect, useLocalSearchParams } from 'expo-router';
 import { useVideoPlayer } from 'expo-video';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { ActivityIndicator, Pressable, ScrollView, Share, Text, View } from 'react-native';
 
 export { ScreenErrorBoundary as ErrorBoundary };
@@ -81,13 +82,19 @@ export default function WatchScreen() {
 
   const { autoplay } = usePlaybackSettings();
 
+  // Focus guard: a watch screen stacked under another one (rapid duplicate
+  // pushes, author→video chains) must never start playing — its blur-time
+  // pause() ran before the stream source landed and was a no-op, so a late
+  // autoplay would layer audio under the focused screen.
+  const isFocusedRef = useRef(true);
+
   // Start playback automatically when the screen is entered or the source
   // changes (new video via the stack, or a resolution switch) unless the
   // user opted out in Settings. Coming back from a deeper screen (author /
   // tag) stays paused — the focus cleanup below paused it on leave.
   // biome-ignore lint/correctness/useExhaustiveDependencies: videoSource is an intentional trigger — replay when the source lands or switches.
   useEffect(() => {
-    if (!autoplay) return;
+    if (!autoplay || !isFocusedRef.current) return;
     try {
       player.play();
     } catch {
@@ -102,7 +109,12 @@ export default function WatchScreen() {
   // "shared object already released", which is safe to ignore.
   useFocusEffect(
     useCallback(() => {
+      isFocusedRef.current = true;
+      // The open that pushed this screen has completed — release the
+      // single-flight guard so the card can be opened again later.
+      endVideoOpen();
       return () => {
+        isFocusedRef.current = false;
         try {
           player.pause();
         } catch {
