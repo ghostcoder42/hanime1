@@ -106,5 +106,15 @@
     "share": "공유",
     "followAuthor": "작가 팔로우",
     "unfollowAuthor": "작가 팔로우 취소"
+  },
+  "errors": {
+    "timeout": "요청 시간 초과 — 네트워크가 느리거나 사이트가 응답하지 않습니다",
+    "blocked": "액세스가 거부되었습니다({{status}}) — 현재 네트워크/IP가 사이트 방화벽(Cloudflare)에 차단되었을 수 있습니다",
+    "notFound": "콘텐츠가 없거나 삭제되었습니다(404)",
+    "serverError": "사이트 서버 오류({{status}})",
+    "httpError": "요청이 거부되었습니다({{status}})",
+    "offline": "인터넷에 연결할 수 없습니다 — 네트워크를 확인하세요",
+    "unreachable": "인터넷은 정상이지만 사이트에 연결할 수 없습니다 — IP/지역이 차단되었거나 연결이 방해받고 있을 수 있습니다",
+    "unknown": "알 수 없는 오류"
   }
 }

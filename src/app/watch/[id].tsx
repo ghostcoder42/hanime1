@@ -8,6 +8,7 @@ import { buildUrl, endpoints } from '@/lib/hanime1/scraper';
 import { haptic, hapticSuccess } from '@/lib/haptics';
 import { usePlaybackSettings, useVideoDownload } from '@/lib/hooks';
 import { useTranslate } from '@/lib/i18n/utils';
+import { networkErrorMessage } from '@/lib/network/errors';
 import {
   useDownloadedStore,
   useFavoritesStore,
@@ -31,6 +32,7 @@ export default function WatchScreen() {
     data: queryData,
     isLoading,
     isError,
+    error,
     refetch,
   } = useVideoDetail({
     variables: { id },
@@ -122,8 +124,10 @@ export default function WatchScreen() {
 
   if (!data) {
     return (
-      <View className="flex-1 items-center justify-center bg-background">
-        <Text className="text-muted-foreground">{t('common.error')}</Text>
+      <View className="flex-1 items-center justify-center bg-background px-8">
+        <Text className="text-center text-sm leading-5 text-muted-foreground">
+          {isError ? networkErrorMessage(error, t) : t('common.error')}
+        </Text>
         <Pressable onPress={() => refetch()} className="mt-3 rounded-full bg-primary px-4 py-2">
           <Text className="text-primary-foreground">{t('common.retry')}</Text>
         </Pressable>

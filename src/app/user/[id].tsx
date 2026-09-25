@@ -2,6 +2,8 @@ import { useUserVideos } from '@/api/video-queries';
 import { ScreenErrorBoundary } from '@/components/error-boundary';
 import { SafeAreaView } from '@/components/safe-area-view';
 import { VideoGrid } from '@/components/video-grid';
+import { useTranslate } from '@/lib/i18n/utils';
+import { networkErrorMessage } from '@/lib/network/errors';
 import { useLocalSearchParams } from 'expo-router';
 import { useMemo } from 'react';
 import { Text, View } from 'react-native';
@@ -9,8 +11,9 @@ import { Text, View } from 'react-native';
 export { ScreenErrorBoundary as ErrorBoundary };
 
 export default function UserScreen() {
+  const t = useTranslate();
   const params = useLocalSearchParams<{ id: string; name?: string }>();
-  const { data, isLoading, refetch, isFetching } = useUserVideos({
+  const { data, isLoading, refetch, isFetching, isError, error } = useUserVideos({
     variables: { id: params.id },
   });
 
@@ -29,6 +32,8 @@ export default function UserScreen() {
         onRefresh={() => refetch()}
         isRefreshing={isFetching && !isLoading}
         isLoading={isLoading}
+        errorText={isError ? networkErrorMessage(error, t) : undefined}
+        onRetry={() => refetch()}
         contentContainerStyle={{ paddingBottom: 24 }}
       />
     </SafeAreaView>

@@ -106,5 +106,15 @@
     "share": "分享",
     "followAuthor": "追踪作者",
     "unfollowAuthor": "取消追踪作者"
+  },
+  "errors": {
+    "timeout": "请求超时——网络太慢或站点无响应",
+    "blocked": "访问被拒绝（{{status}}）——当前网络/IP 可能被站点防火墙（Cloudflare）拦截",
+    "notFound": "内容不存在或已被删除（404）",
+    "serverError": "站点服务器错误（{{status}}）",
+    "httpError": "请求被拒绝（{{status}}）",
+    "offline": "设备无法连接互联网，请检查网络",
+    "unreachable": "网络正常，但无法连接到站点——当前 IP/区域可能被站点屏蔽，或连接被干扰",
+    "unknown": "发生未知错误"
   }
 }
