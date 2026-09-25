@@ -130,10 +130,15 @@ describe('fetchPage', () => {
     globalThis.fetch = realFetch;
   });
 
-  it('throws HttpStatusError carrying the status for non-2xx responses', async () => {
-    globalThis.fetch = (async () => ({ ok: false, status: 404 })) as unknown as typeof fetch;
+  it('throws AppNetworkError with kind + status for non-2xx responses', async () => {
+    globalThis.fetch = (async () => ({
+      ok: false,
+      status: 404,
+      text: async () => '',
+    })) as unknown as typeof fetch;
     await expect(fetchPage('/watch?v=1')).rejects.toMatchObject({
-      name: 'HttpStatusError',
+      name: 'AppNetworkError',
+      kind: 'notFound',
       status: 404,
     });
   });
