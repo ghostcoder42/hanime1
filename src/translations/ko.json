@@ -61,7 +61,8 @@
     "views": "회 시청",
     "uploaded": "업로드",
     "tags": "태그",
-    "play": "재생"
+    "play": "재생",
+    "videoRemoved": "이 영상은 사이트에서 삭제되었습니다"
   },
   "settings": {
     "title": "설정",

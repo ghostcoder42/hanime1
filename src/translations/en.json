@@ -61,7 +61,8 @@
     "views": "views",
     "uploaded": "Uploaded",
     "tags": "Tags",
-    "play": "Play"
+    "play": "Play",
+    "videoRemoved": "This video has been removed from the site"
   },
   "settings": {
     "title": "Settings",

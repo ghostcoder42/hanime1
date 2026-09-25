@@ -4,7 +4,7 @@ import { Icon } from '@/components/icon';
 import { StyledVideoView } from '@/components/native-styled';
 import { SafeAreaView } from '@/components/safe-area-view';
 import { toOfflineDetail } from '@/lib/download/offline-detail';
-import { buildUrl, endpoints } from '@/lib/hanime1/scraper';
+import { HttpStatusError, buildUrl, endpoints } from '@/lib/hanime1/scraper';
 import { haptic, hapticSuccess } from '@/lib/haptics';
 import { usePlaybackSettings, useVideoDownload } from '@/lib/hooks';
 import { useTranslate } from '@/lib/i18n/utils';
@@ -17,8 +17,9 @@ import {
 import { useEvent } from 'expo';
 import { Link, useFocusEffect, useLocalSearchParams } from 'expo-router';
 import { useVideoPlayer } from 'expo-video';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { ActivityIndicator, Pressable, ScrollView, Share, Text, View } from 'react-native';
+import { showMessage } from 'react-native-flash-message';
 
 export { ScreenErrorBoundary as ErrorBoundary };
 
@@ -31,6 +32,7 @@ export default function WatchScreen() {
     data: queryData,
     isLoading,
     isError,
+    error,
     refetch,
   } = useVideoDetail({
     variables: { id },
@@ -39,10 +41,25 @@ export default function WatchScreen() {
 
   const [selectedResolution, setSelectedResolution] = useState<number | null>(null);
 
-  // Offline fallback: if the detail query fails but the video is downloaded,
-  // render from the local metadata so it can still be played.
+  // Offline-first: a downloaded video renders (and starts playing) from the
+  // local metadata immediately, while the detail query keeps refreshing
+  // silently in the background. `download.uri` stays the player source even
+  // after fresh data lands, so playback is never interrupted by the swap.
   const download = useDownloadedStore((s) => s.downloads.find((d) => d.videoId === id) ?? null);
-  const data = queryData ?? (isError && download ? toOfflineDetail(download) : undefined);
+  const offlineDetail = download ? toOfflineDetail(download) : null;
+  const data = queryData ?? offlineDetail ?? undefined;
+
+  // A 404/410 watch page means the site removed the video. With a local
+  // download the screen stays open and playable — just notify once; other
+  // failures (timeouts, bot blocks) stay silent while offline data is shown.
+  const isRemoved =
+    isError && error instanceof HttpStatusError && (error.status === 404 || error.status === 410);
+  const removedNotifiedFor = useRef<string | null>(null);
+  useEffect(() => {
+    if (!isRemoved || !offlineDetail || removedNotifiedFor.current === id) return;
+    removedNotifiedFor.current = id;
+    showMessage({ message: t('detail.videoRemoved'), type: 'warning', position: 'top' });
+  }, [isRemoved, offlineDetail, id, t]);
 
   useEffect(() => {
     if (data) {
@@ -112,7 +129,9 @@ export default function WatchScreen() {
     }, [player])
   );
 
-  if (isLoading) {
+  // Only gate on loading when there is nothing local to show — a downloaded
+  // video must never sit behind a spinner while its metadata refreshes.
+  if (isLoading && !offlineDetail) {
     return (
       <View className="flex-1 items-center justify-center bg-background">
         <ActivityIndicator color="#fb7185" />
@@ -123,7 +142,9 @@ export default function WatchScreen() {
   if (!data) {
     return (
       <View className="flex-1 items-center justify-center bg-background">
-        <Text className="text-muted-foreground">{t('common.error')}</Text>
+        <Text className="text-muted-foreground">
+          {isRemoved ? t('detail.videoRemoved') : t('common.error')}
+        </Text>
         <Pressable onPress={() => refetch()} className="mt-3 rounded-full bg-primary px-4 py-2">
           <Text className="text-primary-foreground">{t('common.retry')}</Text>
         </Pressable>
