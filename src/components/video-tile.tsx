@@ -4,6 +4,7 @@ import { retryDownload } from '@/lib/download/download-video';
 import { type CardOrientation, cardOrientation } from '@/lib/hanime1/images';
 import { buildUrl, endpoints } from '@/lib/hanime1/scraper';
 import { useVideoActions } from '@/lib/hooks';
+import { tryBeginVideoOpen } from '@/lib/navigation/open-guard';
 import { useActiveDownload } from '@/lib/stores/active-downloads-store';
 import { MenuView } from '@react-native-menu/menu';
 import { useRouter } from 'expo-router';
@@ -68,6 +69,10 @@ function VideoTileBase({
   const form = orientation ?? cardOrientation(item.thumbnail);
 
   const openDetail = () => {
+    // The push is synchronous, but while the open is still in flight (screen
+    // not yet focused) repeat taps on this card are swallowed — each extra
+    // push would stack another watch screen with its own native player.
+    if (!tryBeginVideoOpen(item.id)) return;
     router.push({ pathname: '/watch/[id]', params: { id: item.id } });
   };
 
