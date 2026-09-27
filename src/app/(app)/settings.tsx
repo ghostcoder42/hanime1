@@ -16,6 +16,7 @@ import { Env } from '@env';
 // bundles (binding missing at runtime), destructuring after import works.
 import * as ApplicationNS from 'expo-application';
 import { ActivityAction, startActivityAsync } from 'expo-intent-launcher';
+import { Link } from 'expo-router';
 import {
   ActivityIndicator,
   Platform,
@@ -222,6 +223,13 @@ export default function SettingsScreen() {
             <Text className="text-rose-400">{t('common.clear')}</Text>
           </Row>
         </Pressable>
+        <Link href="/logs" asChild>
+          <Pressable android_ripple={{ color: '#00000020' }}>
+            <Row label={t('settings.errorLog')} description={t('settings.errorLogDescription')}>
+              <Icon name="chevron-forward" size={18} color="#71717a" />
+            </Row>
+          </Pressable>
+        </Link>
 
         <SectionTitle>{t('settings.about')}</SectionTitle>
         <Pressable

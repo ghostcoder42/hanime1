@@ -9,7 +9,7 @@ import {
 import { useTranslate } from '@/lib/i18n/utils';
 import { FlashList } from '@shopify/flash-list';
 import type { ReactElement } from 'react';
-import { ActivityIndicator, RefreshControl, ScrollView, Text, View } from 'react-native';
+import { ActivityIndicator, Pressable, RefreshControl, ScrollView, Text, View } from 'react-native';
 
 export type VideoGridProps = {
   items: TileItem[];
@@ -18,6 +18,13 @@ export type VideoGridProps = {
   isRefreshing?: boolean;
   isFetchingNextPage?: boolean;
   isLoading?: boolean;
+  /**
+   * Classified error message for the failed fetch. When set with no items to
+   * show, the grid explains the failure (network blocked, offline, …) with a
+   * retry button — instead of a misleading "no results".
+   */
+  errorText?: string;
+  onRetry?: () => void;
   columns?: number;
   /**
    * Card form for every tile in the grid. All tiles share one orientation so
@@ -39,6 +46,8 @@ export function VideoGrid({
   isRefreshing,
   isFetchingNextPage,
   isLoading,
+  errorText,
+  onRetry,
   columns,
   orientation = 'auto',
   ListHeaderComponent,
@@ -113,7 +122,20 @@ export function VideoGrid({
           <ScrollView
             contentContainerStyle={{ flexGrow: 1, alignItems: 'center', justifyContent: 'center' }}
           >
-            <Text className="text-muted-foreground">{t('common.noResults')}</Text>
+            {errorText ? (
+              <>
+                <Text className="px-8 text-center text-sm leading-5 text-muted-foreground">
+                  {errorText}
+                </Text>
+                {onRetry ? (
+                  <Pressable onPress={onRetry} className="mt-4 rounded-full bg-primary px-5 py-2">
+                    <Text className="text-primary-foreground">{t('common.retry')}</Text>
+                  </Pressable>
+                ) : null}
+              </>
+            ) : (
+              <Text className="text-muted-foreground">{t('common.noResults')}</Text>
+            )}
           </ScrollView>
         }
         ListFooterComponent={

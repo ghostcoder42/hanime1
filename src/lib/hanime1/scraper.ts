@@ -8,23 +8,19 @@
  * named captures the way V8 does. We therefore use **positional** capture
  * groups (`match[1..n]`) exclusively and avoid `.groups`.
  */
+import { appendErrorLog } from '@/lib/logs/error-log';
+import {
+  AppNetworkError,
+  classifyHttpStatus,
+  classifyTransportError,
+  httpErrorDetail,
+} from '@/lib/network/errors';
 import { buildSearchUrl, buildUrl, endpoints } from './endpoints';
 import type { ListResult, VideoDetail, VideoListItem, VideoSource, VideoTag } from './types';
 
 const USER_AGENT =
   'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36';
 const FETCH_TIMEOUT_MS = 15_000;
-
-/** Non-2xx site response — `status` 404/410 marks a video as removed. */
-export class HttpStatusError extends Error {
-  readonly status: number;
-
-  constructor(status: number, url: string) {
-    super(`Request failed (${status}): ${url}`);
-    this.name = 'HttpStatusError';
-    this.status = status;
-  }
-}
 
 /** Iterate all regex matches positionally (Hermes-safe; no `.groups`). */
 function forEachMatch(input: string, pattern: RegExp, cb: (m: RegExpExecArray) => void): void {
@@ -36,7 +32,22 @@ function forEachMatch(input: string, pattern: RegExp, cb: (m: RegExpExecArray) =
   }
 }
 
-/** Fetch a page as text with a desktop UA + timeout. */
+/** Record a failure in the error-log file (see Settings → Error log). */
+function logNetworkError(err: AppNetworkError): void {
+  void appendErrorLog({
+    kind: err.kind,
+    status: err.status,
+    url: err.url,
+    detail: err.detail || err.message,
+  });
+}
+
+/**
+ * Fetch a page as text with a desktop UA + timeout. Failures are classified
+ * (timeout / Cloudflare block / offline / site-unreachable / …) into
+ * `AppNetworkError`s the UI can render specific messages for, and recorded
+ * in the in-app error log.
+ */
 export async function fetchPage(pathOrUrl: string): Promise<string> {
   const url = pathOrUrl.startsWith('http') ? pathOrUrl : buildUrl(pathOrUrl);
   const controller = new AbortController();
@@ -51,14 +62,22 @@ export async function fetchPage(pathOrUrl: string): Promise<string> {
       signal: controller.signal,
     });
     if (!res.ok) {
-      throw new HttpStatusError(res.status, url);
+      const body = await res.text().catch(() => '');
+      const err = new AppNetworkError(classifyHttpStatus(res.status), {
+        message: `Request failed (${res.status})`,
+        status: res.status,
+        url,
+        detail: httpErrorDetail({ status: res.status, body }),
+      });
+      logNetworkError(err);
+      throw err;
     }
     return await res.text();
   } catch (err) {
-    if (err instanceof DOMException && err.name === 'AbortError') {
-      throw new Error('Request timed out');
-    }
-    throw err;
+    if (err instanceof AppNetworkError) throw err;
+    const appErr = await classifyTransportError(err, url);
+    logNetworkError(appErr);
+    throw appErr;
   } finally {
     clearTimeout(timeout);
   }

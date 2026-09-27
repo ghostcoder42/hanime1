@@ -4,10 +4,11 @@ import { Icon } from '@/components/icon';
 import { StyledVideoView } from '@/components/native-styled';
 import { SafeAreaView } from '@/components/safe-area-view';
 import { toOfflineDetail } from '@/lib/download/offline-detail';
-import { HttpStatusError, buildUrl, endpoints } from '@/lib/hanime1/scraper';
+import { buildUrl, endpoints } from '@/lib/hanime1/scraper';
 import { haptic, hapticSuccess } from '@/lib/haptics';
 import { usePlaybackSettings, useVideoDownload } from '@/lib/hooks';
 import { useTranslate } from '@/lib/i18n/utils';
+import { AppNetworkError, networkErrorMessage } from '@/lib/network/errors';
 import {
   useDownloadedStore,
   useFavoritesStore,
@@ -52,8 +53,7 @@ export default function WatchScreen() {
   // A 404/410 watch page means the site removed the video. With a local
   // download the screen stays open and playable — just notify once; other
   // failures (timeouts, bot blocks) stay silent while offline data is shown.
-  const isRemoved =
-    isError && error instanceof HttpStatusError && (error.status === 404 || error.status === 410);
+  const isRemoved = isError && error instanceof AppNetworkError && error.kind === 'notFound';
   const removedNotifiedFor = useRef<string | null>(null);
   useEffect(() => {
     if (!isRemoved || !offlineDetail || removedNotifiedFor.current === id) return;
@@ -98,11 +98,11 @@ export default function WatchScreen() {
 
   const { autoplay } = usePlaybackSettings();
 
-  // Focus guard for the slow-network case: the detail query can resolve long
-  // after the user has backed out of this screen (it stays mounted in the
-  // stack). Firing play() then would start a player that was never attached
-  // to a view — or play audio underneath the previous screen — so autoplay
-  // must only run while this screen actually has focus.
+  // Focus guard: a screen stacked under another one (rapid duplicate pushes,
+  // author→video chains) — or one whose detail query resolves long after the
+  // user backed out — must never start playing. Its blur-time pause() ran
+  // before the stream source landed and was a no-op, so a late autoplay would
+  // layer audio under the focused screen.
   const isFocusedRef = useRef(true);
 
   // Start playback automatically when the screen is entered or the source
@@ -150,9 +150,13 @@ export default function WatchScreen() {
 
   if (!data) {
     return (
-      <View className="flex-1 items-center justify-center bg-background">
-        <Text className="text-muted-foreground">
-          {isRemoved ? t('detail.videoRemoved') : t('common.error')}
+      <View className="flex-1 items-center justify-center bg-background px-8">
+        <Text className="text-center text-sm leading-5 text-muted-foreground">
+          {isRemoved
+            ? t('detail.videoRemoved')
+            : isError
+              ? networkErrorMessage(error, t)
+              : t('common.error')}
         </Text>
         <Pressable onPress={() => refetch()} className="mt-3 rounded-full bg-primary px-4 py-2">
           <Text className="text-primary-foreground">{t('common.retry')}</Text>

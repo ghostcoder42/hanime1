@@ -117,6 +117,16 @@ export default function RootLayout() {
                         ),
                       }}
                     />
+                    <Stack.Screen
+                      name="logs"
+                      options={{
+                        headerShown: true,
+                        title: '',
+                        header: ({ navigation }) => (
+                          <BackHeader onBack={() => navigation.goBack()} />
+                        ),
+                      }}
+                    />
                   </Stack>
                 </APIProvider>
               </PrivacyShield>
