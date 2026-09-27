@@ -1,6 +1,6 @@
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
-import { parseVideoDetail, parseVideoList } from './scraper';
+import { fetchPage, parseVideoDetail, parseVideoList } from './scraper';
 
 function fixture(name: string): string {
   return readFileSync(resolve(__dirname, 'fixtures', name), 'utf8');
@@ -121,5 +121,20 @@ describe('parseVideoDetail', () => {
     const html = '<div class="single-video-tag"><a href="/search?tags%5B%5D=50%off"></a></div>';
     const detail = parseVideoDetail(html, '1');
     expect(detail.tags).toEqual([{ name: '50%off', kind: 'tag' }]);
+  });
+});
+
+describe('fetchPage', () => {
+  const realFetch = globalThis.fetch;
+  afterEach(() => {
+    globalThis.fetch = realFetch;
+  });
+
+  it('throws HttpStatusError carrying the status for non-2xx responses', async () => {
+    globalThis.fetch = (async () => ({ ok: false, status: 404 })) as unknown as typeof fetch;
+    await expect(fetchPage('/watch?v=1')).rejects.toMatchObject({
+      name: 'HttpStatusError',
+      status: 404,
+    });
   });
 });

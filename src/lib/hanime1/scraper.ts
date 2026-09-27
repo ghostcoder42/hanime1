@@ -15,6 +15,17 @@ const USER_AGENT =
   'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36';
 const FETCH_TIMEOUT_MS = 15_000;
 
+/** Non-2xx site response — `status` 404/410 marks a video as removed. */
+export class HttpStatusError extends Error {
+  readonly status: number;
+
+  constructor(status: number, url: string) {
+    super(`Request failed (${status}): ${url}`);
+    this.name = 'HttpStatusError';
+    this.status = status;
+  }
+}
+
 /** Iterate all regex matches positionally (Hermes-safe; no `.groups`). */
 function forEachMatch(input: string, pattern: RegExp, cb: (m: RegExpExecArray) => void): void {
   pattern.lastIndex = 0;
@@ -40,7 +51,7 @@ export async function fetchPage(pathOrUrl: string): Promise<string> {
       signal: controller.signal,
     });
     if (!res.ok) {
-      throw new Error(`Request failed (${res.status}): ${url}`);
+      throw new HttpStatusError(res.status, url);
     }
     return await res.text();
   } catch (err) {
