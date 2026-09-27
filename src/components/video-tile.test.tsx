@@ -1,3 +1,4 @@
+import { endVideoOpen, resetOpenGuard } from '@/lib/navigation/open-guard';
 import { useDownloadedStore } from '@/lib/stores';
 import { useFavoritesStore } from '@/lib/stores';
 import { useActiveDownloadsStore } from '@/lib/stores/active-downloads-store';
@@ -64,6 +65,7 @@ beforeEach(() => {
   useDownloadedStore.setState({ downloads: [], ids: new Set() });
   useActiveDownloadsStore.setState({ tasks: {} });
   mockPush.mockClear();
+  resetOpenGuard();
 });
 afterEach(cleanup);
 
@@ -139,6 +141,53 @@ describe('VideoTile — gestures', () => {
       pathname: '/watch/[id]',
       params: { id: '1' },
     });
+  });
+
+  it('pushes only once for rapid repeat taps on the same card', async () => {
+    const { getByTestId } = await render(<VideoTile item={item} />);
+
+    await act(async () => {
+      for (let i = 0; i < 6; i++) {
+        fireEvent(getByTestId('video-tile'), 'press');
+      }
+    });
+
+    expect(mockPush).toHaveBeenCalledTimes(1);
+  });
+
+  it('opens the same video again once the pushed screen has focused', async () => {
+    const { getByTestId } = await render(<VideoTile item={item} />);
+
+    await act(async () => {
+      fireEvent(getByTestId('video-tile'), 'press');
+    });
+    // The watch screen reports focus — the open completed.
+    act(() => {
+      endVideoOpen();
+    });
+    await act(async () => {
+      fireEvent(getByTestId('video-tile'), 'press');
+    });
+
+    expect(mockPush).toHaveBeenCalledTimes(2);
+  });
+
+  it('still navigates for a different card while another open is in flight', async () => {
+    const other = { ...item, id: '2' };
+    const { getAllByTestId } = await render(
+      <>
+        <VideoTile item={item} />
+        <VideoTile item={other} />
+      </>
+    );
+
+    const tiles = getAllByTestId('video-tile');
+    await act(async () => {
+      fireEvent(tiles[0], 'press');
+      fireEvent(tiles[1], 'press');
+    });
+
+    expect(mockPush).toHaveBeenCalledTimes(2);
   });
 
   it('long-press handler does not call the navigation function (wiring guard)', async () => {
