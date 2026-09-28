@@ -51,6 +51,16 @@ describe('classifyTransportError', () => {
     expect(result.kind).toBe('timeout');
   });
 
+  it('classifies RN-Android aborts ("Fetch request has been canceled") as timeout', async () => {
+    // RN on Android surfaces AbortController fires as
+    // "TypeError: fetch failed: Fetch request has been canceled" — without
+    // the word "abort" anywhere. Seen live on a device (was misclassified
+    // as offline and sent the probe needlessly).
+    const err = new TypeError('fetch failed: Fetch request has been canceled');
+    const result = await classifyTransportError(err, 'https://x/y');
+    expect(result.kind).toBe('timeout');
+  });
+
   it('classifies as offline when the connectivity probe also fails', async () => {
     globalThis.fetch = (async () => {
       throw new TypeError('Network request failed');
