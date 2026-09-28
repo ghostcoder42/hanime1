@@ -92,11 +92,6 @@ export default function WatchScreen() {
   // Prefer the local file when downloaded (works fully offline).
   const videoSource = download?.uri ?? activeSource?.url;
 
-  const player = useVideoPlayer(videoSource ?? null, (p) => {
-    p.loop = true;
-  });
-  const { isPlaying } = useEvent(player, 'playingChange', { isPlaying: player.playing });
-
   const { autoplay } = usePlaybackSettings();
 
   // Focus guard: a screen stacked under another one (rapid duplicate pushes,
@@ -105,6 +100,42 @@ export default function WatchScreen() {
   // before the stream source landed and was a no-op, so a late autoplay would
   // layer audio under the focused screen.
   const isFocusedRef = useRef(true);
+
+  const player = useVideoPlayer(videoSource ?? null, (p) => {
+    p.loop = true;
+    // Autoplay intent belongs to the player's CONSTRUCTION, not to an effect
+    // afterwards: useVideoPlayer recreates the whole native player when the
+    // source lands (null → url), and a play() fired right after that
+    // recreation can race the native prepare and be dropped — the video then
+    // sits paused forever (reproduced on Android 8.1: paused overlay, no
+    // buffering, manual play starts instantly). Playing here, in the same
+    // tick as creation, gives the intent its earliest chance; the
+    // statusChange retry below covers the rest.
+    if (autoplay && isFocusedRef.current) {
+      try {
+        p.play();
+      } catch {
+        // Source not prepared yet — statusChange retry re-asserts autoplay.
+      }
+    }
+  });
+  const { isPlaying } = useEvent(player, 'playingChange', { isPlaying: player.playing });
+  const { status } = useEvent(player, 'statusChange', { status: player.status });
+
+  // Manual pause (while this screen is focused) must win over autoplay
+  // retries. A pause that arrives with focus already lost is the blur
+  // cleanup, not the user. `hasPlayed` keeps the initial paused state from
+  // counting as a user pause.
+  const userPausedRef = useRef(false);
+  const hasPlayedRef = useRef(false);
+  useEffect(() => {
+    if (isPlaying) {
+      userPausedRef.current = false;
+      hasPlayedRef.current = true;
+    } else if (hasPlayedRef.current && isFocusedRef.current) {
+      userPausedRef.current = true;
+    }
+  }, [isPlaying]);
 
   // Start playback automatically when the screen is entered or the source
   // changes (new video via the stack, or a resolution switch) unless the
@@ -119,6 +150,19 @@ export default function WatchScreen() {
       // Player not attached to a source yet — replays when videoSource lands.
     }
   }, [autoplay, player, videoSource]);
+
+  // Compensation retry: even with construction-time intent, re-assert autoplay
+  // once the native player reports readiness — belt and suspenders for
+  // prepare-race paths that drop the initial intent (see setup comment).
+  useEffect(() => {
+    if (status !== 'readyToPlay' || !autoplay || userPausedRef.current) return;
+    if (!isFocusedRef.current) return;
+    try {
+      player.play();
+    } catch {
+      // Player being released — nothing to do.
+    }
+  }, [status, autoplay, player]);
 
   // Release the single-flight navigation guard when the OPEN truly completes.
   // Focus fires on the first frame after the push — while the stack
