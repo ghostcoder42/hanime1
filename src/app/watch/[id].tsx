@@ -8,6 +8,7 @@ import { buildUrl, endpoints } from '@/lib/hanime1/scraper';
 import { haptic, hapticSuccess } from '@/lib/haptics';
 import { usePlaybackSettings, useVideoDownload } from '@/lib/hooks';
 import { useTranslate } from '@/lib/i18n/utils';
+import { endVideoOpen } from '@/lib/navigation/open-guard';
 import { AppNetworkError, networkErrorMessage } from '@/lib/network/errors';
 import {
   useDownloadedStore,
@@ -16,7 +17,7 @@ import {
   useHistoryStore,
 } from '@/lib/stores';
 import { useEvent } from 'expo';
-import { Link, useFocusEffect, useLocalSearchParams } from 'expo-router';
+import { Link, useFocusEffect, useLocalSearchParams, useNavigation } from 'expo-router';
 import { useVideoPlayer } from 'expo-video';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { ActivityIndicator, Pressable, ScrollView, Share, Text, View } from 'react-native';
@@ -119,6 +120,23 @@ export default function WatchScreen() {
     }
   }, [autoplay, player, videoSource]);
 
+  // Release the single-flight navigation guard when the OPEN truly completes.
+  // Focus fires on the first frame after the push — while the stack
+  // transition animation (~300ms) is still running, the source screen stays
+  // visible AND touchable, so taps landing inside that window could push the
+  // same video again (reproduced: furious tapping stacked 2+ screens). The
+  // transition's end is the moment the card is finally covered.
+  const navigation = useNavigation();
+  useEffect(() => {
+    // expo-router's navigation prop doesn't type native-stack's transition
+    // events, but the stack navigator emits them at runtime.
+    const transitionNav = navigation as unknown as {
+      addListener: (event: 'transitionEnd', cb: () => void) => () => void;
+    };
+    const unsubscribe = transitionNav.addListener('transitionEnd', () => endVideoOpen());
+    return unsubscribe;
+  }, [navigation]);
+
   // Pause when this screen loses focus (opening the author page, a tag page or
   // another video keeps this screen mounted in the stack — without this, its
   // audio keeps playing under the new screen). On unmount expo-video may
@@ -129,6 +147,9 @@ export default function WatchScreen() {
       isFocusedRef.current = true;
       return () => {
         isFocusedRef.current = false;
+        // Fallback unlock: the user backed out mid-transition (open aborted)
+        // or no transition event will fire for this navigator.
+        endVideoOpen();
         try {
           player.pause();
         } catch {
