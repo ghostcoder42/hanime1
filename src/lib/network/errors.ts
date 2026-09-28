@@ -121,7 +121,7 @@ function isAbortError(err: unknown): boolean {
   return (
     (err instanceof DOMException && err.name === 'AbortError') ||
     (err instanceof Error && /abort/i.test(err.name)) ||
-    (err instanceof Error && /aborted/i.test(err.message))
+    (err instanceof Error && /abort|cancel/i.test(err.message))
   );
 }
 
