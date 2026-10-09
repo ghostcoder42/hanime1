@@ -199,6 +199,14 @@ export function parseVideoList(html: string, currentPage = 1): ListResult<VideoL
     const item = parseCard(m[1], m[2]);
     if (item) items.push(item);
   });
+  // The site's pagination lies on past-the-end pages: an empty result page
+  // still renders `pagination.next` markers (verified live: page 2 of a
+  // 1-result search — 0 cards, 3 next markers). Trusting it made the
+  // infinite query walk empty pages forever, refetching on every scroll
+  // bounce. An empty page is always terminal, whatever the markers claim.
+  if (items.length === 0) {
+    return { items, nextPage: null, lastPage: null };
+  }
   const pagination = parsePagination(html, currentPage);
   return { items, nextPage: pagination.nextPage, lastPage: pagination.lastPage };
 }
