@@ -48,6 +48,22 @@ describe('parseVideoList — homepage feed', () => {
     expect(result.nextPage).toBe(2); // page 1 always advances to 2 on a multi-page feed
     expect(result.lastPage).toBeGreaterThan(1);
   });
+
+  it('treats an empty page as terminal even when pagination.next markers exist', () => {
+    // Live-verified shape: past-the-end pages render zero cards but still
+    // carry pagination.next markers. Trusting them made the infinite query
+    // walk empty pages forever.
+    const html = `
+      <ul class="pagination">
+        <li><a href="/search?page=1" aria-label="pagination.previous">‹</a></li>
+        <li><a href="/search?page=2" aria-label="pagination.next">›</a></li>
+      </ul>
+      <div id="search-result"></div>`;
+    const result = parseVideoList(html, 2);
+    expect(result.items).toEqual([]);
+    expect(result.nextPage).toBeNull();
+    expect(result.lastPage).toBeNull();
+  });
 });
 
 describe('parseVideoList — genre search page', () => {
