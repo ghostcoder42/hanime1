@@ -1,26 +1,29 @@
 import { useVideoDetail } from '@/api/video-queries';
 import { ScreenErrorBoundary } from '@/components/error-boundary';
-import { Icon } from '@/components/icon';
-import { StyledVideoView } from '@/components/native-styled';
+import { GesturePlayer } from '@/components/player/gesture-player';
 import { SafeAreaView } from '@/components/safe-area-view';
+import { VideoMeta } from '@/components/watch/video-meta';
 import { toOfflineDetail } from '@/lib/download/offline-detail';
-import { buildUrl, endpoints } from '@/lib/hanime1/scraper';
-import { haptic, hapticSuccess } from '@/lib/haptics';
-import { usePlaybackSettings, useVideoDownload } from '@/lib/hooks';
-import { useTranslate } from '@/lib/i18n/utils';
-import { endVideoOpen } from '@/lib/navigation/open-guard';
-import { AppNetworkError, networkErrorMessage } from '@/lib/network/errors';
 import {
-  useDownloadedStore,
-  useFavoritesStore,
-  useFollowingStore,
-  useHistoryStore,
-} from '@/lib/stores';
-import { useEvent } from 'expo';
-import { Link, useFocusEffect, useLocalSearchParams, useNavigation } from 'expo-router';
+  usePlaybackSettings,
+  useVideoDownload,
+  useVideoFullscreen,
+  useWatchPlayer,
+} from '@/lib/hooks';
+import { useTranslate } from '@/lib/i18n/utils';
+import { AppNetworkError, networkErrorMessage } from '@/lib/network/errors';
+import { useDownloadedStore, useHistoryStore } from '@/lib/stores';
+import { useLocalSearchParams, useNavigation } from 'expo-router';
 import { useVideoPlayer } from 'expo-video';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { ActivityIndicator, Pressable, ScrollView, Share, Text, View } from 'react-native';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import {
+  ActivityIndicator,
+  Pressable,
+  ScrollView,
+  Text,
+  View,
+  useWindowDimensions,
+} from 'react-native';
 import { showMessage } from 'react-native-flash-message';
 
 export { ScreenErrorBoundary as ErrorBoundary };
@@ -43,17 +46,14 @@ export default function WatchScreen() {
 
   const [selectedResolution, setSelectedResolution] = useState<number | null>(null);
 
-  // Offline-first: a downloaded video renders (and starts playing) from the
-  // local metadata immediately, while the detail query keeps refreshing
-  // silently in the background. `download.uri` stays the player source even
-  // after fresh data lands, so playback is never interrupted by the swap.
+  // Offline-first: render from local metadata immediately; download.uri
+  // stays the player source after fresh data lands, so playback continues.
   const download = useDownloadedStore((s) => s.downloads.find((d) => d.videoId === id) ?? null);
   const offlineDetail = download ? toOfflineDetail(download) : null;
   const data = queryData ?? offlineDetail ?? undefined;
 
-  // A 404/410 watch page means the site removed the video. With a local
-  // download the screen stays open and playable — just notify once; other
-  // failures (timeouts, bot blocks) stay silent while offline data is shown.
+  // 404/410 = removed from the site. With a local download the screen stays
+  // playable; notify once. Other failures stay silent while offline data shows.
   const isRemoved = isError && error instanceof AppNetworkError && error.kind === 'notFound';
   const removedNotifiedFor = useRef<string | null>(null);
   useEffect(() => {
@@ -93,24 +93,18 @@ export default function WatchScreen() {
   const videoSource = download?.uri ?? activeSource?.url;
 
   const { autoplay } = usePlaybackSettings();
-
-  // Focus guard: a screen stacked under another one (rapid duplicate pushes,
-  // author→video chains) — or one whose detail query resolves long after the
-  // user backed out — must never start playing. Its blur-time pause() ran
-  // before the stream source landed and was a no-op, so a late autoplay would
-  // layer audio under the focused screen.
+  const navigation = useNavigation();
+  // Focus guard shared with the player's construction callback (see below)
+  // and useWatchPlayer.
   const isFocusedRef = useRef(true);
 
   const player = useVideoPlayer(videoSource ?? null, (p) => {
     p.loop = true;
-    // Autoplay intent belongs to the player's CONSTRUCTION, not to an effect
-    // afterwards: useVideoPlayer recreates the whole native player when the
-    // source lands (null → url), and a play() fired right after that
-    // recreation can race the native prepare and be dropped — the video then
-    // sits paused forever (reproduced on Android 8.1: paused overlay, no
-    // buffering, manual play starts instantly). Playing here, in the same
-    // tick as creation, gives the intent its earliest chance; the
-    // statusChange retry below covers the rest.
+    // Feed the custom control bar's progress updates (auto-hides when nothing
+    // listens).
+    p.timeUpdateEventInterval = 0.25;
+    // Autoplay must be baked into construction: a play() after the source
+    // lands races the native prepare and can be dropped. See use-watch-player.
     if (autoplay && isFocusedRef.current) {
       try {
         p.play();
@@ -119,89 +113,22 @@ export default function WatchScreen() {
       }
     }
   });
-  const { isPlaying } = useEvent(player, 'playingChange', { isPlaying: player.playing });
-  const { status } = useEvent(player, 'statusChange', { status: player.status });
 
-  // Manual pause (while this screen is focused) must win over autoplay
-  // retries. A pause that arrives with focus already lost is the blur
-  // cleanup, not the user. `hasPlayed` keeps the initial paused state from
-  // counting as a user pause.
-  const userPausedRef = useRef(false);
-  const hasPlayedRef = useRef(false);
-  useEffect(() => {
-    if (isPlaying) {
-      userPausedRef.current = false;
-      hasPlayedRef.current = true;
-    } else if (hasPlayedRef.current && isFocusedRef.current) {
-      userPausedRef.current = true;
-    }
-  }, [isPlaying]);
+  useWatchPlayer({ player, autoplay, videoSource, navigation, isFocusedRef });
 
-  // Start playback automatically when the screen is entered or the source
-  // changes (new video via the stack, or a resolution switch) unless the
-  // user opted out in Settings. Coming back from a deeper screen (author /
-  // tag) stays paused — the focus cleanup below paused it on leave.
-  // biome-ignore lint/correctness/useExhaustiveDependencies: videoSource is an intentional trigger — replay when the source lands or switches.
-  useEffect(() => {
-    if (!autoplay || !isFocusedRef.current) return;
-    try {
-      player.play();
-    } catch {
-      // Player not attached to a source yet — replays when videoSource lands.
-    }
-  }, [autoplay, player, videoSource]);
+  // In-app fullscreen: style change only, playback never restarts.
+  const [fullscreen, setFullscreen] = useState(false);
+  useVideoFullscreen({
+    fullscreen,
+    navigation,
+    onExitFullscreen: () => setFullscreen(false),
+  });
 
-  // Compensation retry: even with construction-time intent, re-assert autoplay
-  // once the native player reports readiness — belt and suspenders for
-  // prepare-race paths that drop the initial intent (see setup comment).
-  useEffect(() => {
-    if (status !== 'readyToPlay' || !autoplay || userPausedRef.current) return;
-    if (!isFocusedRef.current) return;
-    try {
-      player.play();
-    } catch {
-      // Player being released — nothing to do.
-    }
-  }, [status, autoplay, player]);
-
-  // Release the single-flight navigation guard when the OPEN truly completes.
-  // Focus fires on the first frame after the push — while the stack
-  // transition animation (~300ms) is still running, the source screen stays
-  // visible AND touchable, so taps landing inside that window could push the
-  // same video again (reproduced: furious tapping stacked 2+ screens). The
-  // transition's end is the moment the card is finally covered.
-  const navigation = useNavigation();
-  useEffect(() => {
-    // expo-router's navigation prop doesn't type native-stack's transition
-    // events, but the stack navigator emits them at runtime.
-    const transitionNav = navigation as unknown as {
-      addListener: (event: 'transitionEnd', cb: () => void) => () => void;
-    };
-    const unsubscribe = transitionNav.addListener('transitionEnd', () => endVideoOpen());
-    return unsubscribe;
-  }, [navigation]);
-
-  // Pause when this screen loses focus (opening the author page, a tag page or
-  // another video keeps this screen mounted in the stack — without this, its
-  // audio keeps playing under the new screen). On unmount expo-video may
-  // release the native player before this cleanup runs; pause() then throws
-  // "shared object already released", which is safe to ignore.
-  useFocusEffect(
-    useCallback(() => {
-      isFocusedRef.current = true;
-      return () => {
-        isFocusedRef.current = false;
-        // Fallback unlock: the user backed out mid-transition (open aborted)
-        // or no transition event will fire for this navigator.
-        endVideoOpen();
-        try {
-          player.pause();
-        } catch {
-          // Player already released (screen unmounting) — nothing to do.
-        }
-      };
-    }, [player])
-  );
+  // Player pinned to the top (YouTube-style), rendered LAST to paint above
+  // the scroll content. Fullscreen toggling is a style change only — the
+  // player instance (and playback) survives.
+  const { width: windowWidth } = useWindowDimensions();
+  const inlineHeight = Math.round((windowWidth * 9) / 16);
 
   // Only gate on loading when there is nothing local to show — a downloaded
   // video must never sit behind a spinner while its metadata refreshes.
@@ -231,242 +158,54 @@ export default function WatchScreen() {
   }
 
   return (
-    <SafeAreaView className="flex-1 bg-background" edges={['bottom']}>
-      <ScrollView contentContainerStyle={{ paddingBottom: 32 }}>
-        {/* Player */}
-        <View className="aspect-video w-full bg-black">
-          {videoSource ? (
-            <StyledVideoView
-              player={player}
-              showsTimecodes
-              contentFit="contain"
-              nativeControls
-              className="h-full w-full"
-            />
-          ) : (
-            <View className="flex-1 items-center justify-center">
-              <Text className="text-white/70">No stream source</Text>
-            </View>
-          )}
-          {!isPlaying && videoSource ? (
-            <View className="pointer-events-none absolute inset-0 items-center justify-center">
-              <Icon name="play-circle" size={64} color="white" />
-            </View>
-          ) : null}
+    <View className="flex-1 bg-background">
+      {!fullscreen && <View style={{ height: inlineHeight }} className="w-full bg-black" />}
+      <SafeAreaView className="flex-1" edges={['bottom']}>
+        <ScrollView contentContainerStyle={{ paddingBottom: 32 }}>
+          <VideoMeta
+            detail={data}
+            resolution={resolution}
+            onSelectResolution={setSelectedResolution}
+            downloadState={downloadState}
+          />
+        </ScrollView>
+      </SafeAreaView>
+
+      {/* Player surface — one instance, inline or fullscreen styling */}
+      {videoSource ? (
+        <GesturePlayer
+          player={player}
+          fullscreen={fullscreen}
+          onToggleFullscreen={setFullscreen}
+          title={data.title}
+          style={
+            fullscreen
+              ? [{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }, { zIndex: 100 }]
+              : {
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  height: inlineHeight,
+                  zIndex: 10,
+                }
+          }
+        />
+      ) : (
+        <View
+          style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            height: inlineHeight,
+            zIndex: 10,
+          }}
+          className="items-center justify-center bg-black"
+        >
+          <Text className="text-white/70">No stream source</Text>
         </View>
-
-        {/* Meta */}
-        <View className="px-4 pt-3">
-          <Text className="text-lg font-semibold text-foreground">{data.title}</Text>
-          <View className="mt-1 flex-row flex-wrap items-center">
-            {data.author ? (
-              data.authorId ? (
-                <Link
-                  href={{
-                    pathname: '/user/[id]',
-                    params: { id: data.authorId, name: data.author },
-                  }}
-                  asChild
-                >
-                  <Pressable>
-                    <Text className="text-sm text-rose-400">{data.author}</Text>
-                  </Pressable>
-                </Link>
-              ) : (
-                <Text className="text-sm text-rose-400">{data.author}</Text>
-              )
-            ) : null}
-            {data.viewsText ? (
-              <Text className="text-sm text-muted-foreground">
-                {'  ·  '}
-                {data.viewsText}
-              </Text>
-            ) : null}
-            {data.uploadedDate ? (
-              <Text className="text-sm text-muted-foreground">
-                {'  ·  '}
-                {data.uploadedDate}
-              </Text>
-            ) : null}
-          </View>
-
-          {/* Quality + actions */}
-          <View className="mt-3 flex-row flex-wrap items-center gap-2">
-            {data.sources.length > 1 &&
-              [...data.sources]
-                .sort((a, b) => a.resolution - b.resolution)
-                .map((s) => (
-                  <Pressable
-                    key={s.resolution}
-                    onPress={() => setSelectedResolution(s.resolution)}
-                    className={`rounded-full px-3 py-1.5 ${s.resolution === resolution ? 'bg-primary' : 'bg-muted'}`}
-                  >
-                    <Text
-                      className={
-                        s.resolution === resolution ? 'text-primary-foreground' : 'text-foreground'
-                      }
-                    >
-                      {s.resolution}p
-                    </Text>
-                  </Pressable>
-                ))}
-          </View>
-
-          <View className="mt-3 flex-row flex-wrap gap-2">
-            <FavoriteButton id={data.id} item={data} />
-            <DownloadButton state={downloadState} />
-            <ShareButton id={data.id} title={data.title} />
-            {data.author ? (
-              <FollowAuthorButton name={data.author} id={data.authorId ?? data.author} />
-            ) : null}
-          </View>
-
-          {/* Description */}
-          {data.description ? (
-            <Text className="mt-4 text-sm leading-5 text-muted-foreground">{data.description}</Text>
-          ) : null}
-
-          {/* Tags */}
-          {data.tags.length > 0 ? (
-            <View className="mt-4">
-              <Text className="mb-1 text-xs font-semibold uppercase text-muted-foreground">
-                {t('detail.tags')}
-              </Text>
-              <View className="flex-row flex-wrap gap-2">
-                {data.tags.map((tag) => (
-                  <Link
-                    key={`${tag.kind}:${tag.name}`}
-                    href={{
-                      pathname: '/tag/[name]',
-                      params: { name: tag.name, type: tag.kind },
-                    }}
-                    asChild
-                  >
-                    <Pressable className="rounded-full bg-muted px-2.5 py-1">
-                      <Text className="text-xs text-foreground">
-                        {tag.kind === 'query' ? `#${tag.name}` : tag.name}
-                      </Text>
-                    </Pressable>
-                  </Link>
-                ))}
-              </View>
-            </View>
-          ) : null}
-        </View>
-      </ScrollView>
-    </SafeAreaView>
-  );
-}
-
-function FavoriteButton({ id, item }: { id: string; item: { title: string; thumbnail: string } }) {
-  const t = useTranslate();
-  const isFav = useFavoritesStore((s) => s.isFavorite(id));
-  const add = useFavoritesStore((s) => s.addFavorite);
-  const remove = useFavoritesStore((s) => s.removeFavorite);
-  return (
-    <Pressable
-      onPress={() => {
-        hapticSuccess();
-        if (isFav) remove(id);
-        else add({ id, title: item.title, thumbnail: item.thumbnail });
-      }}
-      className={`flex-row items-center gap-1.5 rounded-full px-3 py-1.5 ${isFav ? 'bg-rose-500' : 'bg-muted'}`}
-    >
-      <Icon
-        name={isFav ? 'heart' : 'heart-outline'}
-        size={16}
-        color={isFav ? 'white' : '#71717a'}
-      />
-      <Text className={isFav ? 'text-white' : 'text-foreground'}>
-        {t(isFav ? 'actions.removeFromFavorites' : 'actions.addToFavorites')}
-      </Text>
-    </Pressable>
-  );
-}
-
-function ShareButton({ id, title }: { id: string; title: string }) {
-  const t = useTranslate();
-  const onShare = () => {
-    haptic();
-    void Share.share({ url: buildUrl(endpoints.watch(id)), message: title });
-  };
-  return (
-    <Pressable
-      onPress={onShare}
-      className="flex-row items-center gap-1.5 rounded-full bg-muted px-3 py-1.5"
-    >
-      <Icon name="share-outline" size={16} color="#71717a" />
-      <Text className="text-foreground">{t('actions.share')}</Text>
-    </Pressable>
-  );
-}
-
-function FollowAuthorButton({ id, name }: { id: string; name: string }) {
-  const t = useTranslate();
-  const isFollowing = useFollowingStore((s) => s.isFollowing(id));
-  const follow = useFollowingStore((s) => s.follow);
-  const unfollow = useFollowingStore((s) => s.unfollow);
-  return (
-    <Pressable
-      onPress={() => {
-        hapticSuccess();
-        if (isFollowing) unfollow(id);
-        else follow({ id, name });
-      }}
-      className={`flex-row items-center gap-1.5 rounded-full px-3 py-1.5 ${isFollowing ? 'bg-rose-500' : 'bg-muted'}`}
-    >
-      <Icon
-        name={isFollowing ? 'person-remove' : 'person-add'}
-        size={16}
-        color={isFollowing ? 'white' : '#71717a'}
-      />
-      <Text className={isFollowing ? 'text-white' : 'text-foreground'}>
-        {t(isFollowing ? 'actions.unfollowAuthor' : 'actions.followAuthor')}
-      </Text>
-    </Pressable>
-  );
-}
-
-function DownloadButton({ state }: { state: ReturnType<typeof useVideoDownload> }) {
-  const t = useTranslate();
-  if (state.error) {
-    return (
-      <Pressable
-        onPress={state.handleDownload}
-        className="flex-row items-center gap-1.5 rounded-full bg-destructive px-3 py-1.5"
-      >
-        <Icon name="alert-circle" size={16} color="white" />
-        <Text className="text-white">{t('common.resume')}</Text>
-      </Pressable>
-    );
-  }
-  if (state.isDownloaded) {
-    return (
-      <View className="flex-row items-center gap-1.5 rounded-full bg-emerald-600 px-3 py-1.5">
-        <Icon name="checkmark-circle" size={16} color="white" />
-        <Text className="text-white">{t('detail.downloaded')}</Text>
-      </View>
-    );
-  }
-  if (state.isDownloading) {
-    const pct = Math.round(state.downloadProgress * 100);
-    return (
-      <View className="flex-row items-center gap-1.5 rounded-full bg-muted px-3 py-1.5">
-        <ActivityIndicator size="small" color="#fb7185" />
-        <Text className="text-foreground">{t('detail.downloading', { progress: pct })}</Text>
-      </View>
-    );
-  }
-  return (
-    <Pressable
-      onPress={() => {
-        haptic();
-        void state.handleDownload();
-      }}
-      className="flex-row items-center gap-1.5 rounded-full bg-primary px-3 py-1.5"
-    >
-      <Icon name="download" size={16} color="white" />
-      <Text className="text-primary-foreground">{t('detail.download')}</Text>
-    </Pressable>
+      )}
+    </View>
   );
 }
