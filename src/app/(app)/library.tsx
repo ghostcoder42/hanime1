@@ -11,7 +11,15 @@ import { useDownloadedStore, useFavoritesStore, useHistoryStore } from '@/lib/st
 import { type ActiveDownload, useActiveDownloadsStore } from '@/lib/stores/active-downloads-store';
 import { useRouter } from 'expo-router';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Alert, Pressable, ScrollView, Text, View, useWindowDimensions } from 'react-native';
+import {
+  Alert,
+  Pressable,
+  ScrollView,
+  Text,
+  View,
+  useWindowDimensions,
+  type ScrollViewInstance,
+} from 'react-native';
 
 type Tab = 'history' | 'downloads' | 'favorites';
 
@@ -314,7 +322,7 @@ export { ScreenErrorBoundary as ErrorBoundary };
 export default function LibraryScreen() {
   const t = useTranslate();
   const [activeTab, setActiveTab] = useState<Tab>('downloads');
-  const pagerRef = useRef<ScrollView>(null);
+  const pagerRef = useRef<ScrollViewInstance>(null);
   const { width } = useWindowDimensions();
   const TABS = useMemo(() => TAB_KEYS.map((key) => ({ key, label: t(TAB_LABEL[key]) })), [t]);
 

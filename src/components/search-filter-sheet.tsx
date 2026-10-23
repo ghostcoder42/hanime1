@@ -16,15 +16,7 @@ export function activeFilterCount(state: FilterState): number {
   return (state.sortKey ? 1 : 0) + state.tags.length + (state.broad ? 1 : 0);
 }
 
-function Chip({
-  active,
-  label,
-  onPress,
-}: {
-  active: boolean;
-  label: string;
-  onPress: () => void;
-}) {
+function Chip({ active, label, onPress }: { active: boolean; label: string; onPress: () => void }) {
   return (
     <Pressable
       onPress={onPress}

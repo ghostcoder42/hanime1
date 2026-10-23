@@ -24,21 +24,21 @@ export default function AppTabsLayout() {
         name="index"
         options={{
           title: t('tabs.browse'),
-          tabBarIcon: ({ color }) => <Icon name="grid" size={24} color={color} />,
+          tabBarIcon: ({ color }) => <Icon name="grid" size={24} color={color as string} />,
         }}
       />
       <Tabs.Screen
         name="library"
         options={{
           title: t('tabs.library'),
-          tabBarIcon: ({ color }) => <Icon name="library" size={24} color={color} />,
+          tabBarIcon: ({ color }) => <Icon name="library" size={24} color={color as string} />,
         }}
       />
       <Tabs.Screen
         name="settings"
         options={{
           title: t('tabs.settings'),
-          tabBarIcon: ({ color }) => <Icon name="settings" size={24} color={color} />,
+          tabBarIcon: ({ color }) => <Icon name="settings" size={24} color={color as string} />,
         }}
       />
     </Tabs>
