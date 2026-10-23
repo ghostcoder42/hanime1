@@ -1,17 +1,15 @@
 {
-  "$schema": "https://biomejs.dev/schemas/1.9.4/schema.json",
+  "$schema": "https://biomejs.dev/schemas/2.6.2/schema.json",
   "vcs": {
     "enabled": true,
     "clientKind": "git",
     "useIgnoreFile": true
   },
-  "organizeImports": {
-    "enabled": true
-  },
+  "assist": { "actions": { "source": { "organizeImports": "off" } } },
   "linter": {
     "enabled": true,
     "rules": {
-      "recommended": true,
+      "preset": "recommended",
       "correctness": {
         "noUnusedImports": "warn",
         "noUnusedVariables": "warn"
@@ -47,16 +45,22 @@
     }
   },
   "files": {
-    "ignore": [
-      "node_modules",
-      ".expo",
-      "ios",
-      "android",
-      "*.lock",
-      "bun.lockb",
-      ".vscode",
-      "__mocks__",
-      "src/components/ui"
+    "includes": [
+      "**",
+      "!**/node_modules",
+      "!**/.expo",
+      "!**/ios",
+      "!**/android",
+      "!**/*.lock",
+      "!**/bun.lockb",
+      "!**/.vscode",
+      "!**/__mocks__",
+      "!**/src/components/ui",
+      "!**/src/lib/hanime1/fixtures",
+      "!**/*.css",
+      "!**/*.yml",
+      "!**/*.yaml",
+      "!**/*.md"
     ]
   }
 }

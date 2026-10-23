@@ -13,7 +13,10 @@ import { ActivityIndicator, Pressable, Share, Text, View } from 'react-native';
 export function FavoriteButton({
   id,
   item,
-}: { id: string; item: { title: string; thumbnail: string } }) {
+}: {
+  id: string;
+  item: { title: string; thumbnail: string };
+}) {
   const t = useTranslate();
   const isFav = useFavoritesStore((s) => s.isFavorite(id));
   const add = useFavoritesStore((s) => s.addFavorite);

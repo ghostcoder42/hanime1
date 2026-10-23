@@ -155,6 +155,7 @@ export default ({ config }: ConfigContext): ExpoConfig =>
         },
       ],
       'expo-font',
+      'expo-status-bar',
       'expo-video',
       'expo-image',
       'expo-localization',
