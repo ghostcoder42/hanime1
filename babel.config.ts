@@ -2,7 +2,7 @@ export default (api) => {
   api.cache.using(() => process.env.NODE_ENV ?? 'default');
 
   return {
-    presets: ['babel-preset-expo', './nativewind-preset.cjs'],
+    presets: ['babel-preset-expo'],
     plugins: [
       [
         'module-resolver',

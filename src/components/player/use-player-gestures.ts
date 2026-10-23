@@ -9,11 +9,16 @@
  * delta gates fire on every touch event during fast drags and flood the JS
  * thread, making the display lag behind the player.
  */
-import { Gesture, type GestureDetector } from 'react-native-gesture-handler';
+import {
+  Gesture,
+  type GestureType,
+  type LegacyComposedGesture,
+} from 'react-native-gesture-handler';
 import { type SharedValue, runOnJS, useSharedValue } from 'react-native-reanimated';
 
 /** Whatever GestureDetector accepts (plain or composed gestures). */
-export type AnyGesture = React.ComponentProps<typeof GestureDetector>['gesture'];
+/** Whatever the legacy GestureDetector accepts (plain or composed gestures). */
+export type AnyGesture = LegacyComposedGesture | GestureType;
 import { useMemo } from 'react';
 import {
   AXIS_H,
