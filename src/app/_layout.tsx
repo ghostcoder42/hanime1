@@ -1,4 +1,4 @@
-import '../../global.css';
+import '@/styles/css';
 import '@/lib/i18n';
 import { APIProvider } from '@/api/common/api-provider';
 import { ErrorBoundary } from '@/components/error-boundary';

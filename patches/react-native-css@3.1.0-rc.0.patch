@@ -1,0 +1,53 @@
+diff --git a/dist/commonjs/components/index.js b/dist/commonjs/components/index.js
+index 1a7ccc0791fcc52951bddb8d29ff5d91b6533ab2..4977b5137415c5581573d243247cf395a5b787c6 100644
+--- a/dist/commonjs/components/index.js
++++ b/dist/commonjs/components/index.js
+@@ -4,6 +4,7 @@ Object.defineProperty(exports, "__esModule", {
+   value: true
+ });
+ var _exportNames = {
++  AssetRegistry: true,
+   ActivityIndicator: true,
+   Button: true,
+   FlatList: true,
+@@ -21,6 +22,12 @@ var _exportNames = {
+   View: true,
+   VirtualizedList: true
+ };
++Object.defineProperty(exports, "AssetRegistry", {
++  enumerable: true,
++  get: function () {
++    return require("react-native").AssetRegistry;
++  }
++});
+ Object.defineProperty(exports, "ActivityIndicator", {
+   enumerable: true,
+   get: function () {
+diff --git a/dist/module/components/index.cjs b/dist/module/components/index.cjs
+index 23af26cff9df498d6c7723abba2e5f7a9a219336..a1406fe3d53c87349202962979a6a65e8274baf0 100644
+--- a/dist/module/components/index.cjs
++++ b/dist/module/components/index.cjs
+@@ -6,6 +6,9 @@
+ /* eslint-disable @typescript-eslint/no-require-imports */
+ 
+ module.exports = {
++  get AssetRegistry() {
++    return require("react-native").AssetRegistry;
++  },
+   get ActivityIndicator() {
+     return require("./ActivityIndicator").ActivityIndicator;
+   },
+diff --git a/src/components/index.cts b/src/components/index.cts
+index ead6ff4e49a132f375488744647af5baeb9a17a6..5d354549ad00ea955bb363e26ab3a853c114d131 100644
+--- a/src/components/index.cts
++++ b/src/components/index.cts
+@@ -4,6 +4,9 @@
+ /* eslint-disable @typescript-eslint/no-require-imports */
+ 
+ module.exports = {
++  get AssetRegistry() {
++    return require("react-native").AssetRegistry;
++  },
+   get ActivityIndicator() {
+     return require("./ActivityIndicator").ActivityIndicator;
+   },

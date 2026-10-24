@@ -83,15 +83,7 @@ function Row({
   );
 }
 
-function Pill({
-  active,
-  label,
-  onPress,
-}: {
-  active: boolean;
-  label: string;
-  onPress: () => void;
-}) {
+function Pill({ active, label, onPress }: { active: boolean; label: string; onPress: () => void }) {
   return (
     <Pressable
       onPress={onPress}

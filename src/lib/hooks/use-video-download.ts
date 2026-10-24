@@ -1,8 +1,8 @@
+import { useCallback } from 'react';
 import { localUriFor } from '@/lib/download';
 import { downloadVideo, retryDownload } from '@/lib/download/download-video';
 import { useActiveDownload, useActiveDownloadsStore } from '@/lib/stores/active-downloads-store';
 import { useDownloadedStore } from '@/lib/stores/downloaded-store';
-import { useCallback } from 'react';
 
 export type UseVideoDownloadOptions = {
   videoId: string;
@@ -35,13 +35,7 @@ export function useVideoDownload(opts: UseVideoDownloadOptions): VideoDownloadSt
 
   const isDownloading =
     !!active && (active.status === 'downloading' || active.status === 'preparing');
-  const downloadProgress = active
-    ? active.progress < 0
-      ? 0
-      : active.progress
-    : isDownloaded
-      ? 1
-      : 0;
+  const downloadProgress = active ? Math.max(0, active.progress) : isDownloaded ? 1 : 0;
   const error = active?.status === 'error' ? (active.error ?? 'Download failed') : null;
 
   const handleDownload = useCallback(async () => {
