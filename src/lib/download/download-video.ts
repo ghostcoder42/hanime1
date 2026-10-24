@@ -9,6 +9,8 @@ import {
   localUriFor,
   saveDownloadMetadata,
 } from './index';
+import { getStorageLocation } from './storage-migrate';
+import { placeIntoUserSpace } from './user-space';
 
 export type DownloadVideoOptions = {
   videoId: string;
@@ -79,6 +81,26 @@ async function finalizeDownload(
     downloadedAt: Date.now(),
     author,
   };
+
+  // Placement: the transfer always stages in the app dir (resumable downloads
+  // need a writable file path); when user space is selected, the finished file
+  // is copied into the media library and the staging original removed. On any
+  // failure we keep the app-space copy — the video is downloaded and playable
+  // either way, only its location differs.
+  if (getStorageLocation() === 'user') {
+    try {
+      const placed = await placeIntoUserSpace(result.uri);
+      await FileSystem.deleteAsync(result.uri, { idempotent: true });
+      meta.uri = placed.uri;
+      meta.assetId = placed.assetId;
+      meta.location = 'user';
+    } catch {
+      meta.location = 'app';
+    }
+  } else {
+    meta.location = 'app';
+  }
+
   saveDownloadMetadata(meta);
   // Keep the reactive store in sync so badges light up across the app.
   useDownloadedStore.getState().register(meta);

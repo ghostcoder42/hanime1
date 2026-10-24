@@ -100,7 +100,21 @@
     "releaseDate": "릴리스",
     "releaseNotes": "업데이트 내용:",
     "errorLog": "오류 로그",
-    "errorLogDescription": "최근 네트워크 오류 보기(복사 가능)"
+    "errorLogDescription": "최근 네트워크 오류 보기(복사 가능)",
+    "storage": "저장소",
+    "storageLocation": "다운로드 위치",
+    "storageDesc": "새 다운로드가 저장되는 위치. 사용자 공간은 시스템 미디어 라이브러리(갤러리)이며 앱을 삭제해도 유지됩니다",
+    "locApp": "앱 공간",
+    "locUser": "사용자 공간",
+    "storagePermDenied": "사용자 공간을 사용하려면 미디어 라이브러리 권한이 필요합니다",
+    "migrating": "동영상 이동 중({{done}}/{{total}})…",
+    "migrateDoneUser": "동영상 {{n}}개를 사용자 공간으로 이동했습니다",
+    "migrateDoneApp": "동영상 {{n}}개를 앱 공간으로 되돌렸습니다",
+    "migratePartial": "{{moved}}개 이동, {{failed}}개 실패(원래 위치에 유지)",
+    "moveToAppTitle": "앱 공간으로 되돌릴까요?",
+    "moveToAppMsg": "동영상 {{n}}개가 사용자 공간(미디어 라이브러리)에 있습니다. 되돌리면 갤러리에서 더 이상 표시되지 않습니다. 그대로 둘 수도 있습니다(새 다운로드는 앱 공간에 저장됨).",
+    "moveToAppMove": "앱 공간으로 이동",
+    "moveToAppKeep": "미디어 라이브러리에 유지"
   },
   "actions": {
     "addToFavorites": "즐겨찾기에 추가",

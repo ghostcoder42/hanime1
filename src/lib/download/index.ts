@@ -7,12 +7,16 @@ export type DownloadMetadata = {
   videoId: string;
   title: string;
   thumbnail: string;
-  /** local file:// uri */
+  /** Playable local file:// uri (app dir or media-library path). */
   uri: string;
   size: number;
   resolution: number;
   downloadedAt: number;
   author?: string;
+  /** Where the file lives. Absent = 'app' (entries predate the setting). */
+  location?: 'app' | 'user';
+  /** Media-library asset id — present iff location is 'user'. */
+  assetId?: string;
 };
 
 const KEY = 'download_metadata';
@@ -44,13 +48,32 @@ export function saveDownloadMetadata(meta: DownloadMetadata): void {
   setItem(KEY, map);
 }
 
+/**
+ * Removes a video's file from wherever it lives. User-space entries must go
+ * through the media library (a plain unlink of the MediaStore path is not
+ * permitted on modern Android); falls back to a path delete when the media
+ * entry is already gone (e.g. user removed it from the gallery app).
+ */
+async function removeVideoFile(meta: DownloadMetadata): Promise<void> {
+  if (meta.location === 'user' && meta.assetId) {
+    const { deleteFromUserSpace } = await import('./user-space');
+    try {
+      await deleteFromUserSpace(meta.assetId);
+      return;
+    } catch {
+      // Fall through: the asset may already be gone from the media library.
+    }
+  }
+  const info = await FileSystem.getInfoAsync(meta.uri);
+  if (info.exists) {
+    await FileSystem.deleteAsync(meta.uri, { idempotent: true });
+  }
+}
+
 export async function deleteDownload(videoId: string): Promise<void> {
   const meta = getDownloadByVideoId(videoId);
   if (meta) {
-    const info = await FileSystem.getInfoAsync(meta.uri);
-    if (info.exists) {
-      await FileSystem.deleteAsync(meta.uri, { idempotent: true });
-    }
+    await removeVideoFile(meta);
   }
   const map = readMap();
   delete map[videoId];
@@ -63,10 +86,7 @@ export async function deleteDownload(videoId: string): Promise<void> {
 
 export async function clearAllDownloads(): Promise<void> {
   for (const meta of getAllDownloads()) {
-    const info = await FileSystem.getInfoAsync(meta.uri);
-    if (info.exists) {
-      await FileSystem.deleteAsync(meta.uri, { idempotent: true });
-    }
+    await removeVideoFile(meta);
   }
   removeItem(KEY);
 }

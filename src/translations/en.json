@@ -100,7 +100,21 @@
     "releaseDate": "Released",
     "releaseNotes": "What's new:",
     "errorLog": "Error log",
-    "errorLogDescription": "View recent network errors (copyable)"
+    "errorLogDescription": "View recent network errors (copyable)",
+    "storage": "Storage",
+    "storageLocation": "Download location",
+    "storageDesc": "Where new downloads are saved; user space is the system media library (gallery) and survives an app uninstall",
+    "locApp": "App storage",
+    "locUser": "User space",
+    "storagePermDenied": "Media library permission is required to use user space",
+    "migrating": "Moving videos ({{done}}/{{total}})…",
+    "migrateDoneUser": "Moved {{n}} videos to user space",
+    "migrateDoneApp": "Moved {{n}} videos back to app storage",
+    "migratePartial": "Moved {{moved}}, {{failed}} failed (kept in place)",
+    "moveToAppTitle": "Move back to app storage?",
+    "moveToAppMsg": "{{n}} videos are in user space (media library). Moving them back removes them from the gallery app. You can also keep them there — new downloads will still go to app storage.",
+    "moveToAppMove": "Move back",
+    "moveToAppKeep": "Keep in media library"
   },
   "actions": {
     "addToFavorites": "Add to favorites",

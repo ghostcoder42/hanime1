@@ -2,9 +2,9 @@
 // (toBeOnTheScreen, toBeVisible, ...) when the library is imported in tests.
 
 // react-hook form setup for testing
-// @ts-ignore
+// @ts-expect-error
 global.window = {};
-// @ts-ignore
+// @ts-expect-error
 global.window = global;
 
 // Mock react-native-capture-protection (native module not available in jsdom)
@@ -21,3 +21,23 @@ jest.mock('nativewind', () => ({ styled: (component: unknown) => component }));
 // module scope by components under test.
 jest.mock('expo-video', () => ({ VideoView: () => null, useVideoPlayer: () => ({}) }));
 jest.mock('expo-image', () => ({ Image: () => null }));
+
+// expo-media-library reaches for the native module at import time; tests that
+// exercise user-space logic override the pieces they need per-file.
+jest.mock('expo-media-library', () => {
+  class MockAsset {
+    id: string;
+    static create = jest.fn();
+    static delete = jest.fn();
+    delete = jest.fn();
+    getUri = jest.fn();
+    constructor(id: string) {
+      this.id = id;
+    }
+  }
+  return {
+    Asset: MockAsset,
+    Album: { get: jest.fn(), create: jest.fn() },
+    requestPermissionsAsync: jest.fn().mockResolvedValue({ granted: true }),
+  };
+});
