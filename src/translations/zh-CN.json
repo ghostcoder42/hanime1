@@ -100,7 +100,21 @@
     "releaseDate": "发布于",
     "releaseNotes": "更新说明：",
     "errorLog": "错误日志",
-    "errorLogDescription": "查看最近的网络错误详情，可复制"
+    "errorLogDescription": "查看最近的网络错误详情，可复制",
+    "storage": "存储",
+    "storageLocation": "下载位置",
+    "storageDesc": "新下载视频的保存位置；用户空间指系统媒体库（相册），卸载应用后文件仍保留",
+    "locApp": "应用空间",
+    "locUser": "用户空间",
+    "storagePermDenied": "需要媒体库权限才能使用用户空间",
+    "migrating": "正在迁移视频（{{done}}/{{total}}）…",
+    "migrateDoneUser": "已把 {{n}} 个视频移到用户空间",
+    "migrateDoneApp": "已把 {{n}} 个视频移回应用空间",
+    "migratePartial": "已移动 {{moved}} 个，{{failed}} 个失败（保留原位置）",
+    "moveToAppTitle": "移回应用空间？",
+    "moveToAppMsg": "已有 {{n}} 个视频在用户空间（媒体库）。移回应用空间后它们将不再显示在相册中；也可以选择保留，新下载仍会保存到应用空间。",
+    "moveToAppMove": "移回应用空间",
+    "moveToAppKeep": "保留在媒体库"
   },
   "actions": {
     "addToFavorites": "加入收藏",

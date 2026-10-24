@@ -100,7 +100,21 @@
     "releaseDate": "發布於",
     "releaseNotes": "更新說明：",
     "errorLog": "錯誤日誌",
-    "errorLogDescription": "檢視最近的網路錯誤詳情，可複製"
+    "errorLogDescription": "檢視最近的網路錯誤詳情，可複製",
+    "storage": "儲存",
+    "storageLocation": "下載位置",
+    "storageDesc": "新下載影片的儲存位置；使用者空間指系統媒體庫（相簿），解除安裝應用後檔案仍保留",
+    "locApp": "應用空間",
+    "locUser": "使用者空間",
+    "storagePermDenied": "需要媒體庫權限才能使用使用者空間",
+    "migrating": "正在遷移影片（{{done}}/{{total}}）…",
+    "migrateDoneUser": "已把 {{n}} 部影片移到使用者空間",
+    "migrateDoneApp": "已把 {{n}} 部影片移回應用空間",
+    "migratePartial": "已移動 {{moved}} 部，{{failed}} 部失敗（保留原位置）",
+    "moveToAppTitle": "移回應用空間？",
+    "moveToAppMsg": "已有 {{n}} 部影片在使用者空間（媒體庫）。移回應用空間後它們將不再顯示在相簿中；也可以選擇保留，新下載仍會儲存到應用空間。",
+    "moveToAppMove": "移回應用空間",
+    "moveToAppKeep": "保留在媒體庫"
   },
   "actions": {
     "addToFavorites": "加入收藏",

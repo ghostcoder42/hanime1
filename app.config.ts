@@ -159,6 +159,14 @@ export default ({ config }: ConfigContext): ExpoConfig =>
       'expo-video',
       'expo-image',
       'expo-localization',
+      [
+        'expo-media-library',
+        {
+          photosPermission:
+            'Allows the app to save downloaded videos to your media library and to move them back into app storage.',
+          savePhotosPermission: 'Allows the app to save downloaded videos to your media library.',
+        },
+      ],
       // Blank the app in the recents/app-switcher and block screenshots/recording.
       ['react-native-capture-protection', { captureType: 'base' }],
     ],

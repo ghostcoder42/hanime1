@@ -100,7 +100,21 @@
     "releaseDate": "リリース日",
     "releaseNotes": "更新内容：",
     "errorLog": "エラーログ",
-    "errorLogDescription": "最近のネットワークエラーを表示（コピー可能）"
+    "errorLogDescription": "最近のネットワークエラーを表示（コピー可能）",
+    "storage": "ストレージ",
+    "storageLocation": "保存先",
+    "storageDesc": "新しいダウンロードの保存先。ユーザー領域はシステムのメディアライブラリ（ギャラリー）で、アプリをアンインストールしても残ります",
+    "locApp": "アプリ内",
+    "locUser": "ユーザー領域",
+    "storagePermDenied": "ユーザー領域を使用するにはメディアライブラリの権限が必要です",
+    "migrating": "動画を移動中（{{done}}/{{total}}）…",
+    "migrateDoneUser": "{{n}} 本の動画をユーザー領域に移動しました",
+    "migrateDoneApp": "{{n}} 本の動画をアプリ内に戻しました",
+    "migratePartial": "{{moved}} 本を移動、{{failed}} 本は失敗（元の場所に保持）",
+    "moveToAppTitle": "アプリ内に戻しますか？",
+    "moveToAppMsg": "{{n}} 本の動画がユーザー領域（メディアライブラリ）にあります。戻すとギャラリーには表示されなくなります。このまま残すこともできます（新しいダウンロードはアプリ内に保存されます）。",
+    "moveToAppMove": "アプリ内に戻す",
+    "moveToAppKeep": "メディアライブラリに残す"
   },
   "actions": {
     "addToFavorites": "お気に入りに追加",
