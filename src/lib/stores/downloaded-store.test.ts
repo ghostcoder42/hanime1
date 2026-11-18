@@ -1,4 +1,5 @@
 jest.mock('@/lib/download', () => ({
+  backfillMissingSizes: jest.fn().mockResolvedValue(undefined),
   reconcileDownloads: jest.fn().mockResolvedValue([]),
   getAllDownloads: jest.fn().mockReturnValue([]),
   getDownloadByVideoId: jest.fn().mockReturnValue(null),

@@ -15,6 +15,9 @@ const instance = {
   delete: (key: string) => {
     delete store[key];
   },
+  remove: (key: string) => {
+    delete store[key];
+  },
   contains: (key: string) => key in store,
   getAllKeys: () => Object.keys(store),
   clearAll: () => {
