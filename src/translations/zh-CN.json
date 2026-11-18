@@ -1,22 +1,22 @@
 {
   "common": {
-    "appName": "HAnime1",
-    "loading": "载入中…",
     "retry": "重试",
     "pause": "暂停",
     "resume": "继续",
     "error": "发生错误",
-    "empty": "目前没有内容",
     "noResults": "找不到结果",
     "endOfList": "已经看完啦",
-    "close": "关闭",
-    "save": "保存",
     "cancel": "取消",
     "delete": "删除",
     "clear": "清除",
-    "search": "搜索",
     "on": "开",
-    "off": "关"
+    "off": "关",
+    "appName": "HAnime1",
+    "close": "关闭",
+    "empty": "目前没有内容",
+    "loading": "载入中…",
+    "save": "保存",
+    "search": "搜索"
   },
   "tabs": {
     "browse": "浏览",
@@ -24,15 +24,15 @@
     "settings": "设置"
   },
   "home": {
-    "title": "最新",
-    "latest": "最新上传"
+    "latest": "最新上传",
+    "title": "最新"
   },
   "search": {
     "placeholder": "搜索影片、标签、作者…",
-    "history": "最近搜索",
     "clearHistory": "清除搜索记录",
-    "sort": "排序",
     "genre": "类别",
+    "history": "最近搜索",
+    "sort": "排序",
     "tags": "标签"
   },
   "library": {
@@ -57,12 +57,12 @@
     "download": "下载",
     "downloading": "下载中… {{progress}}%",
     "downloaded": "已下载",
-    "quality": "画质",
-    "views": "次观看",
-    "uploaded": "上架",
     "tags": "标签",
+    "videoRemoved": "该视频已从站点移除",
     "play": "播放",
-    "videoRemoved": "该视频已从站点移除"
+    "quality": "画质",
+    "uploaded": "上架",
+    "views": "次观看"
   },
   "settings": {
     "title": "设置",
@@ -83,7 +83,6 @@
     "security": "安全",
     "hidePreview": "隐藏预览",
     "data": "数据",
-    "clearCache": "清除图片缓存",
     "clearHistory": "清除观看记录",
     "about": "关于",
     "version": "版本",
@@ -142,15 +141,16 @@
     "keepInOld": "保留在原文件夹",
     "migrateDoneFolder": "已把 {{n}} 个视频移到新文件夹",
     "migratingOverlayTitle": "正在移动视频",
-    "migratingOverlayPreparing": "准备中…"
+    "migratingOverlayPreparing": "准备中…",
+    "clearCache": "清除图片缓存"
   },
   "actions": {
     "addToFavorites": "加入收藏",
     "removeFromFavorites": "取消收藏",
-    "download": "下载",
     "share": "分享",
     "followAuthor": "追踪作者",
-    "unfollowAuthor": "取消追踪作者"
+    "unfollowAuthor": "取消追踪作者",
+    "download": "下载"
   },
   "errors": {
     "timeout": "请求超时——网络太慢或站点无响应",

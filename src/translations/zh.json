@@ -1,22 +1,22 @@
 {
   "common": {
-    "appName": "HAnime1",
-    "loading": "載入中…",
     "retry": "重試",
     "pause": "暫停",
     "resume": "繼續",
     "error": "發生錯誤",
-    "empty": "目前沒有內容",
     "noResults": "找不到結果",
     "endOfList": "已經看完啦",
-    "close": "關閉",
-    "save": "儲存",
     "cancel": "取消",
     "delete": "刪除",
     "clear": "清除",
-    "search": "搜尋",
     "on": "開",
-    "off": "關"
+    "off": "關",
+    "appName": "HAnime1",
+    "close": "關閉",
+    "empty": "目前沒有內容",
+    "loading": "載入中…",
+    "save": "儲存",
+    "search": "搜尋"
   },
   "tabs": {
     "browse": "瀏覽",
@@ -24,15 +24,15 @@
     "settings": "設定"
   },
   "home": {
-    "title": "最新",
-    "latest": "最新上傳"
+    "latest": "最新上傳",
+    "title": "最新"
   },
   "search": {
     "placeholder": "搜尋影片、標籤、作者…",
-    "history": "最近搜尋",
     "clearHistory": "清除搜尋紀錄",
-    "sort": "排序",
     "genre": "類別",
+    "history": "最近搜尋",
+    "sort": "排序",
     "tags": "標籤"
   },
   "library": {
@@ -57,12 +57,12 @@
     "download": "下載",
     "downloading": "下載中… {{progress}}%",
     "downloaded": "已下載",
-    "quality": "畫質",
-    "views": "次觀看",
-    "uploaded": "上架",
     "tags": "標籤",
+    "videoRemoved": "此影片已從網站移除",
     "play": "播放",
-    "videoRemoved": "此影片已從網站移除"
+    "quality": "畫質",
+    "uploaded": "上架",
+    "views": "次觀看"
   },
   "settings": {
     "title": "設定",
@@ -83,7 +83,6 @@
     "security": "安全",
     "hidePreview": "隱藏預覽",
     "data": "資料",
-    "clearCache": "清除圖片快取",
     "clearHistory": "清除觀看紀錄",
     "about": "關於",
     "version": "版本",
@@ -142,15 +141,16 @@
     "keepInOld": "保留在原資料夾",
     "migrateDoneFolder": "已把 {{n}} 部影片移到新資料夾",
     "migratingOverlayTitle": "正在移動影片",
-    "migratingOverlayPreparing": "準備中…"
+    "migratingOverlayPreparing": "準備中…",
+    "clearCache": "清除圖片快取"
   },
   "actions": {
     "addToFavorites": "加入收藏",
     "removeFromFavorites": "取消收藏",
-    "download": "下載",
     "share": "分享",
     "followAuthor": "追蹤作者",
-    "unfollowAuthor": "取消追蹤作者"
+    "unfollowAuthor": "取消追蹤作者",
+    "download": "下載"
   },
   "errors": {
     "timeout": "請求逾時——網路太慢或站點無回應",

@@ -41,7 +41,7 @@ export function useTranslate() {
   const { t } = useTranslation();
   // Cast react-i18next's heavily-overloaded `t` to the simple typed signature
   // the app uses (TxKeyPath key + options → string).
-  const tt = t as (key: string, options?: TranslateOptions) => string;
+  const tt = t as unknown as (key: string, options?: TranslateOptions) => string;
   return useCallback((key: TxKeyPath, options?: TranslateOptions) => tt(key, options ?? {}), [tt]);
 }
 

@@ -1,5 +1,5 @@
 diff --git a/dist/commonjs/components/index.js b/dist/commonjs/components/index.js
-index 1a7ccc0791fcc52951bddb8d29ff5d91b6533ab2..4977b5137415c5581573d243247cf395a5b787c6 100644
+index 1a7ccc0791fcc52951bddb8d29ff5d91b6533ab2..96d722c0d4b54293c178ca566db494e25fd19be6 100644
 --- a/dist/commonjs/components/index.js
 +++ b/dist/commonjs/components/index.js
 @@ -4,6 +4,7 @@ Object.defineProperty(exports, "__esModule", {
@@ -10,19 +10,21 @@ index 1a7ccc0791fcc52951bddb8d29ff5d91b6533ab2..4977b5137415c5581573d243247cf395
    ActivityIndicator: true,
    Button: true,
    FlatList: true,
-@@ -21,6 +22,12 @@ var _exportNames = {
+@@ -21,7 +22,13 @@ var _exportNames = {
    View: true,
    VirtualizedList: true
  };
+-Object.defineProperty(exports, "ActivityIndicator", {
 +Object.defineProperty(exports, "AssetRegistry", {
 +  enumerable: true,
 +  get: function () {
 +    return require("react-native").AssetRegistry;
 +  }
 +});
- Object.defineProperty(exports, "ActivityIndicator", {
++Object.defineProperty(exports, "ActivityIndicator", {Object.defineProperty(exports, "ActivityIndicator", {
    enumerable: true,
    get: function () {
+     return _ActivityIndicator.ActivityIndicator;
 diff --git a/dist/module/components/index.cjs b/dist/module/components/index.cjs
 index 23af26cff9df498d6c7723abba2e5f7a9a219336..a1406fe3d53c87349202962979a6a65e8274baf0 100644
 --- a/dist/module/components/index.cjs

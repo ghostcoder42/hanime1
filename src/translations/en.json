@@ -1,22 +1,22 @@
 {
   "common": {
-    "appName": "HAnime1",
-    "loading": "Loading…",
     "retry": "Retry",
     "pause": "Pause",
     "resume": "Resume",
     "error": "Something went wrong",
-    "empty": "Nothing here yet",
     "noResults": "No results found",
     "endOfList": "You're all caught up",
-    "close": "Close",
-    "save": "Save",
     "cancel": "Cancel",
     "delete": "Delete",
     "clear": "Clear",
-    "search": "Search",
     "on": "On",
-    "off": "Off"
+    "off": "Off",
+    "appName": "HAnime1",
+    "close": "Close",
+    "empty": "Nothing here yet",
+    "loading": "Loading…",
+    "save": "Save",
+    "search": "Search"
   },
   "tabs": {
     "browse": "Browse",
@@ -24,15 +24,15 @@
     "settings": "Settings"
   },
   "home": {
-    "title": "Latest",
-    "latest": "Latest uploads"
+    "latest": "Latest uploads",
+    "title": "Latest"
   },
   "search": {
     "placeholder": "Search videos, tags, artists…",
-    "history": "Recent searches",
     "clearHistory": "Clear search history",
-    "sort": "Sort",
     "genre": "Genre",
+    "history": "Recent searches",
+    "sort": "Sort",
     "tags": "Tags"
   },
   "library": {
@@ -57,12 +57,12 @@
     "download": "Download",
     "downloading": "Downloading… {{progress}}%",
     "downloaded": "Downloaded",
-    "quality": "Quality",
-    "views": "views",
-    "uploaded": "Uploaded",
     "tags": "Tags",
+    "videoRemoved": "This video has been removed from the site",
     "play": "Play",
-    "videoRemoved": "This video has been removed from the site"
+    "quality": "Quality",
+    "uploaded": "Uploaded",
+    "views": "views"
   },
   "settings": {
     "title": "Settings",
@@ -83,7 +83,6 @@
     "security": "Security",
     "hidePreview": "Hide preview",
     "data": "Data",
-    "clearCache": "Clear image cache",
     "clearHistory": "Clear watch history",
     "about": "About",
     "version": "Version",
@@ -142,15 +141,16 @@
     "keepInOld": "Keep in old folder",
     "migrateDoneFolder": "Moved {{n}} videos to the new folder",
     "migratingOverlayTitle": "Moving videos",
-    "migratingOverlayPreparing": "Preparing…"
+    "migratingOverlayPreparing": "Preparing…",
+    "clearCache": "Clear image cache"
   },
   "actions": {
     "addToFavorites": "Add to favorites",
     "removeFromFavorites": "Remove from favorites",
-    "download": "Download",
     "share": "Share",
     "followAuthor": "Follow author",
-    "unfollowAuthor": "Unfollow author"
+    "unfollowAuthor": "Unfollow author",
+    "download": "Download"
   },
   "errors": {
     "timeout": "Request timed out — the network is too slow or the site is unresponsive",

@@ -1,22 +1,22 @@
 {
   "common": {
-    "appName": "HAnime1",
-    "loading": "読み込み中…",
     "retry": "再試行",
     "pause": "一時停止",
     "resume": "再開",
     "error": "エラーが発生しました",
-    "empty": "まだありません",
     "noResults": "結果が見つかりません",
     "endOfList": "すべて表示しました",
-    "close": "閉じる",
-    "save": "保存",
     "cancel": "キャンセル",
     "delete": "削除",
     "clear": "クリア",
-    "search": "検索",
     "on": "オン",
-    "off": "オフ"
+    "off": "オフ",
+    "appName": "HAnime1",
+    "close": "閉じる",
+    "empty": "まだありません",
+    "loading": "読み込み中…",
+    "save": "保存",
+    "search": "検索"
   },
   "tabs": {
     "browse": "閲覧",
@@ -24,15 +24,15 @@
     "settings": "設定"
   },
   "home": {
-    "title": "最新",
-    "latest": "最新アップロード"
+    "latest": "最新アップロード",
+    "title": "最新"
   },
   "search": {
     "placeholder": "動画、タグ、作者を検索…",
-    "history": "最近の検索",
     "clearHistory": "検索履歴を消去",
-    "sort": "並び替え",
     "genre": "ジャンル",
+    "history": "最近の検索",
+    "sort": "並び替え",
     "tags": "タグ"
   },
   "library": {
@@ -57,12 +57,12 @@
     "download": "ダウンロード",
     "downloading": "ダウンロード中… {{progress}}%",
     "downloaded": "ダウンロード済み",
-    "quality": "画質",
-    "views": "回視聴",
-    "uploaded": "投稿",
     "tags": "タグ",
+    "videoRemoved": "この動画はサイトから削除されました",
     "play": "再生",
-    "videoRemoved": "この動画はサイトから削除されました"
+    "quality": "画質",
+    "uploaded": "投稿",
+    "views": "回視聴"
   },
   "settings": {
     "title": "設定",
@@ -83,7 +83,6 @@
     "security": "セキュリティ",
     "hidePreview": "プレビューを非表示",
     "data": "データ",
-    "clearCache": "画像キャッシュを消去",
     "clearHistory": "視聴履歴を消去",
     "about": "情報",
     "version": "バージョン",
@@ -142,15 +141,16 @@
     "keepInOld": "旧フォルダーに残す",
     "migrateDoneFolder": "動画 {{n}} 本を新しいフォルダーに移動しました",
     "migratingOverlayTitle": "動画を移動中",
-    "migratingOverlayPreparing": "準備中…"
+    "migratingOverlayPreparing": "準備中…",
+    "clearCache": "画像キャッシュを消去"
   },
   "actions": {
     "addToFavorites": "お気に入りに追加",
     "removeFromFavorites": "お気に入りから削除",
-    "download": "ダウンロード",
     "share": "共有",
     "followAuthor": "作者をフォロー",
-    "unfollowAuthor": "作者のフォローを解除"
+    "unfollowAuthor": "作者のフォローを解除",
+    "download": "ダウンロード"
   },
   "errors": {
     "timeout": "リクエストがタイムアウトしました——ネットワークが遅いか、サイトが応答していません",
