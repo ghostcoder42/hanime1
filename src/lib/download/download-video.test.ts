@@ -41,6 +41,7 @@ jest.mock('@/lib/download', () => ({
   DOWNLOAD_DIR: 'file:///doc/videos/',
   ensureDownloadDir: jest.fn().mockResolvedValue(undefined),
   localUriFor: (id: string) => `file:///doc/videos/${id}.mp4`,
+  renameStagedToReadable: jest.fn((uri: string, _title: string, _id: string) => uri),
   saveDownloadMetadata: jest.fn(),
   deleteDownload: jest.fn().mockResolvedValue(undefined),
 }));

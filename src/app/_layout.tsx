@@ -7,6 +7,7 @@ import { FlexGestureHandlerRootView } from '@/components/native-styled';
 import { SafeAreaView } from '@/components/safe-area-view';
 import { PrivacyShield } from '@/components/security/PrivacyShield';
 import { GluestackUIProvider } from '@/components/ui/gluestack-ui-provider';
+import { MigrationOverlay } from '@/components/migration-overlay';
 import { useThemeConfig } from '@/lib/hooks';
 import { useDownloadedStore } from '@/lib/stores';
 import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
@@ -128,6 +129,7 @@ export default function RootLayout() {
                       }}
                     />
                   </Stack>
+                  <MigrationOverlay />
                 </APIProvider>
               </PrivacyShield>
             </ErrorBoundary>

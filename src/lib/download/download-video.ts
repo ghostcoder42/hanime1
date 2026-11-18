@@ -7,8 +7,12 @@ import {
   deleteDownload,
   ensureDownloadDir,
   localUriFor,
+  renameStagedToReadable,
   saveDownloadMetadata,
 } from './index';
+import { getStorageLocation, getUserSpaceMode } from './storage-migrate';
+import { placeIntoUserSpace } from './user-space';
+import { getHiddenFolderUri, placeIntoHiddenFolder } from './user-space-hidden';
 
 export type DownloadVideoOptions = {
   videoId: string;
@@ -48,6 +52,12 @@ function reportProgress(videoId: string, written: number, expected: number) {
 
 type DownloadResult = FileSystem.FileSystemDownloadResult;
 
+/** Header names arrive in either case depending on the platform/native stack. */
+function contentLengthOf(headers?: Record<string, string>): number {
+  const raw = headers?.['Content-Length'] ?? headers?.['content-length'] ?? undefined;
+  return raw ? Number.parseInt(String(raw), 10) || 0 : 0;
+}
+
 /** Shared success path for downloadAsync() and resumeAsync() results. */
 async function finalizeDownload(
   opts: DownloadVideoOptions,
@@ -67,18 +77,57 @@ async function finalizeDownload(
     throw new Error('Download cancelled');
   }
 
+  // Staged under the id during transfer (resume point naming); give the
+  // finished file its readable title name before it leaves app space.
+  const stagedUri = await renameStagedToReadable(result.uri, title, videoId);
+
+  let size = contentLengthOf(result.headers);
+  if (!size) {
+    // No Content-Length (or pre-fix legacy path) — the finished file is the
+    // ground truth.
+    const info = await FileSystem.getInfoAsync(stagedUri);
+    if (info.exists && 'size' in info) size = info.size;
+  }
+
   const meta: DownloadMetadata = {
     videoId,
     title,
     thumbnail,
-    uri: result.uri,
-    size: result.headers?.['Content-Length']
-      ? Number.parseInt(String(result.headers['Content-Length']), 10)
-      : 0,
+    uri: stagedUri,
+    size,
     resolution,
     downloadedAt: Date.now(),
     author,
   };
+
+  // Placement: the transfer always stages in the app dir (resumable downloads
+  // need a writable file path); when user space is selected, the finished file
+  // is copied out — into the media library, or into the hidden SAF folder when
+  // that mode is on — and the staging original removed. On any failure we keep
+  // the app-space copy — the video is playable either way, only its location
+  // differs.
+  if (getStorageLocation() === 'user') {
+    try {
+      const treeUri = getUserSpaceMode() === 'hidden' ? getHiddenFolderUri() : null;
+      if (treeUri) {
+        const placed = await placeIntoHiddenFolder(stagedUri, title, videoId, treeUri);
+        await FileSystem.deleteAsync(result.uri, { idempotent: true });
+        meta.uri = placed.uri;
+        meta.docUri = placed.uri;
+      } else {
+        const placed = await placeIntoUserSpace(stagedUri);
+        await FileSystem.deleteAsync(stagedUri, { idempotent: true });
+        meta.uri = placed.uri;
+        meta.assetId = placed.assetId;
+      }
+      meta.location = 'user';
+    } catch {
+      meta.location = 'app';
+    }
+  } else {
+    meta.location = 'app';
+  }
+
   saveDownloadMetadata(meta);
   // Keep the reactive store in sync so badges light up across the app.
   useDownloadedStore.getState().register(meta);

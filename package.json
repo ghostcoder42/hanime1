@@ -1,6 +1,6 @@
 {
   "name": "hanime1",
-  "version": "0.4.3",
+  "version": "0.4.2",
   "main": "expo-router/entry",
   "dependencies": {
     "@expo/html-elements": "^58.0.3",
@@ -26,6 +26,7 @@
     "expo-linking": "~58.0.14",
     "expo-local-authentication": "~58.0.2",
     "expo-localization": "~58.0.5",
+    "expo-media-library": "~58.0.12",
     "expo-router": "~58.0.26",
     "expo-screen-orientation": "~58.0.3",
     "expo-splash-screen": "~58.0.11",
@@ -49,6 +50,7 @@
     "react-native-mmkv": "^4.3.2",
     "react-native-reanimated": "4.7.1",
     "react-native-restart": "^0.0.29",
+    "react-native-saf-x": "^2.2.3",
     "react-native-safe-area-context": "~5.10.1",
     "react-native-screens": "~4.30.0",
     "react-native-svg": "15.16.0",
@@ -114,6 +116,7 @@
     "unrs-resolver"
   ],
   "patchedDependencies": {
-    "react-native-css@3.1.0-rc.0": "patches/react-native-css@3.1.0-rc.0.patch"
+    "react-native-css@3.1.0-rc.0": "patches/react-native-css@3.1.0-rc.0.patch",
+    "expo-media-library@58.0.12": "patches/expo-media-library@58.0.12.patch"
   }
 }

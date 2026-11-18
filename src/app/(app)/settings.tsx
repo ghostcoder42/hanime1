@@ -2,6 +2,7 @@ import { queryClient } from '@/api/common/query-client';
 import { ScreenErrorBoundary } from '@/components/error-boundary';
 import { Icon } from '@/components/icon';
 import { SafeAreaView } from '@/components/safe-area-view';
+import { StorageSection } from '@/components/settings/storage-section';
 import { UpdateDialog } from '@/components/update-dialog';
 import { SITE_DOMAINS, SITE_DOMAIN_KEY, type SiteDomain } from '@/lib/hanime1/endpoints';
 import { type ThemeMode, usePlaybackSettings, useThemeConfig } from '@/lib/hooks';
@@ -150,6 +151,8 @@ export default function SettingsScreen() {
             trackColor={{ true: '#f43f5e', false: '#a1a1aa' }}
           />
         </Row>
+
+        <StorageSection />
 
         <SectionTitle>{t('settings.domain')}</SectionTitle>
         <Row label={t('settings.domain')} description={t('settings.domainDescription')}>

@@ -1,5 +1,6 @@
 import {
   type DownloadMetadata,
+  backfillMissingSizes,
   clearAllDownloads,
   deleteDownload,
   getAllDownloads,
@@ -33,6 +34,7 @@ export const useDownloadedStore = create<DownloadedStore>((set, get) => ({
     useActiveDownloadsStore.getState().restoreInterrupted();
     const activeIds = new Set(Object.keys(useActiveDownloadsStore.getState().tasks));
     await reconcileDownloads(activeIds);
+    await backfillMissingSizes();
     const downloads = getAllDownloads();
     set({
       downloads,
