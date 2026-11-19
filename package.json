@@ -1,6 +1,6 @@
 {
   "name": "hanime1",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "main": "expo-router/entry",
   "dependencies": {
     "@expo/html-elements": "^58.0.3",
@@ -116,6 +116,7 @@
     "unrs-resolver"
   ],
   "patchedDependencies": {
-    "react-native-css@3.1.0-rc.1": "patches/react-native-css@3.1.0-rc.1.patch"
+    "react-native-css@3.1.0-rc.1": "patches/react-native-css@3.1.0-rc.1.patch",
+    "react-native-saf-x@2.2.3": "patches/react-native-saf-x@2.2.3.patch"
   }
 }

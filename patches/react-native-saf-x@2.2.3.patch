@@ -1,0 +1,13 @@
+diff --git a/android/build.gradle b/android/build.gradle
+index e0031ec866809d4ced9b06adec194032c7447d26..deee59335e8d5d66bf08b262affd9027159bb230 100644
+--- a/android/build.gradle
++++ b/android/build.gradle
+@@ -20,7 +20,7 @@ def safeExtGet(prop, fallback) {
+ }
+ 
+ android {
+-  compileSdkVersion safeExtGet('SafX_compileSdkVersion', 31)
++  compileSdkVersion safeExtGet('SafX_compileSdkVersion', 37)
+   defaultConfig {
+     minSdkVersion safeExtGet('SafX_minSdkVersion', 21)
+     targetSdkVersion safeExtGet('SafX_targetSdkVersion', 31)
