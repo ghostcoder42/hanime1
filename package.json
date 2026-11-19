@@ -116,6 +116,7 @@
     "unrs-resolver"
   ],
   "patchedDependencies": {
-    "react-native-css@3.1.0-rc.1": "patches/react-native-css@3.1.0-rc.1.patch"
+    "react-native-css@3.1.0-rc.1": "patches/react-native-css@3.1.0-rc.1.patch",
+    "react-native-saf-x@2.2.3": "patches/react-native-saf-x@2.2.3.patch"
   }
 }
